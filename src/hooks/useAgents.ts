@@ -1,8 +1,9 @@
 import { AgentCard } from "@a2a-js/sdk";
+import { A2AClient } from "@a2a-js/sdk/client";
 import React from "react";
 
 import { useToastContext } from "@/contexts/ToastContext";
-import { getAgentCard } from "@/lib/api/agent-card";
+import { createA2AProxyFetch } from "@/lib/api/proxy-fetch";
 import { parseAgentUrls } from "@/lib/env";
 
 export interface UseAgentsReturn {
@@ -12,7 +13,11 @@ export interface UseAgentsReturn {
   setActiveAgent: (agent: AgentCard | null) => void;
 }
 
-export const useAgents = (): UseAgentsReturn => {
+interface UseAgentsParams {
+  customHeaders?: Record<string, string>;
+}
+
+export const useAgents = (params?: UseAgentsParams): UseAgentsReturn => {
   const [agents, setAgents] = React.useState<AgentCard[]>([]);
   const [activeAgent, setActiveAgent] = React.useState<AgentCard | null>(null);
 
@@ -24,7 +29,11 @@ export const useAgents = (): UseAgentsReturn => {
     }
 
     try {
-      const agentCard = await getAgentCard(url);
+      const A2AProxyFetch: typeof fetch = createA2AProxyFetch(params?.customHeaders);
+      const client: A2AClient = await A2AClient.fromCardUrl(url.trim(), {
+        fetchImpl: A2AProxyFetch,
+      });
+      const agentCard: AgentCard = await client.getAgentCard();
 
       setAgents((prev) => {
         // Check if agent already exists

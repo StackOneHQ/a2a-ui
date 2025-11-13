@@ -47,7 +47,7 @@ export const createA2AProxyFetch = (customHeaders?: Record<string, string>): typ
       },
       body: JSON.stringify({
         url,
-        method: init?.method || "POST",
+        method: init?.method || "GET",
         headers,
         body,
         customHeaders,

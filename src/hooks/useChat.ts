@@ -36,11 +36,11 @@ export const useChat = (): UseChatReturn => {
   const [newChatMessageText, setNewChatMessageText] = React.useState<string>("");
   const [autoFocusChatTextField, setAutoFocusChatTextField] = React.useState<boolean>(false);
 
-  const agents = useAgents();
+  const settings = useSettings();
+  const agents = useAgents({ customHeaders: settings.getHeadersObject() });
   const chatContexts = useChatContexts();
   const selected = useSelected();
   const scrolling = useScrolling();
-  const settings = useSettings();
   const { showToast } = useToastContext();
 
   // Focus text field on initial mount
