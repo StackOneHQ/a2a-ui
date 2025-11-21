@@ -135,7 +135,7 @@ export class A2aUiService extends Construct {
                     this.ecrRegistry,
                     props.releaseTag ?? 'latest',
                 ),
-                containerPort: props.ecs.containerPort ?? 4080,
+                containerPort: props.ecs.containerPort ?? 3000,
                 executionRole: this.ecsRole,
                 taskRole: this.ecsRole,
                 enableLogging: true,
