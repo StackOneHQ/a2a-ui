@@ -43,12 +43,12 @@ export class A2AStack extends Stack {
             hostedZone,
             certificateArn: _context.certificateArn,
             datadogApiKeySecretArn: _context.datadogApiKeySecretArn,
-            ecs: _context.ecs.api,
+            ecs: _context.ecs['a2a-ui'],
             cloudfront: _context.cloudfront,
             environment: this.env,
             releaseTag: releaseTag ?? 'latest',
         };
 
-        const apiService = new A2aUiService(this, 'Api', apiServiceProps);
+        new A2aUiService(this, 'Api', apiServiceProps);
     }
 }

@@ -29,7 +29,7 @@ describe('api', () => {
                         ecs: {
                             'a2a-ui': {
                                 dockerRepository:
-                                    'arn:aws:ecr:eu-west-2:553332017094:repository/a2a/api',
+                                    'arn:aws:ecr:eu-west-2:553332017094:repository/a2a/a2a-ui',
                                 containerPort: 3000,
                                 containerName: 'a2a',
                                 desiredCount: 1,

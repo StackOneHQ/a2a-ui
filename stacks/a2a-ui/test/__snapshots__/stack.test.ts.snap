@@ -14,15 +14,15 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
     },
   },
   "Outputs": {
-    "A2AFargateServiceLoadBalancerDNS0221C4E3": {
+    "A2aUiFargateServiceLoadBalancerDNS9B2EB5F7": {
       "Value": {
         "Fn::GetAtt": [
-          "A2AFargateServiceLBF5697ECA",
+          "A2aUiFargateServiceLBF3F8D114",
           "DNSName",
         ],
       },
     },
-    "A2AFargateServiceServiceURL5BEC2173": {
+    "A2aUiFargateServiceServiceURL9F7F5F9D": {
       "Value": {
         "Fn::Join": [
           "",
@@ -30,29 +30,13 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
             "https://",
             {
               "Fn::GetAtt": [
-                "A2AFargateServiceLBF5697ECA",
+                "A2aUiFargateServiceLBF3F8D114",
                 "DNSName",
               ],
             },
           ],
         ],
       },
-    },
-    "MigrationsTaskDefinitionArn": {
-      "Value": {
-        "Ref": "MigrationsMigrationsTaskDefinition88166088",
-      },
-    },
-    "MigrationsTaskSecurityGroupId": {
-      "Value": {
-        "Fn::GetAtt": [
-          "MigrationsMigrationsTaskSecurityGroup1FBBCEAD",
-          "GroupId",
-        ],
-      },
-    },
-    "MigrationsTaskSubnetIds": {
-      "Value": "p-12345,p-67890",
     },
   },
   "Parameters": {
@@ -67,235 +51,12 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
     },
   },
   "Resources": {
-    "A2AApiAuroraAccessSGE4043334": {
-      "Properties": {
-        "GroupDescription": "a2a/A2A/ApiAuroraAccessSG",
-        "GroupName": "a2a-api-aurora-access-sg",
-        "SecurityGroupEgress": [
-          {
-            "CidrIp": "0.0.0.0/0",
-            "Description": "Allow all outbound traffic by default",
-            "IpProtocol": "-1",
-          },
-        ],
-        "VpcId": "vpc-12345",
-      },
-      "Type": "AWS::EC2::SecurityGroup",
-    },
-    "A2AApiAuroraClusterC0CD99B7": {
-      "DeletionPolicy": "Snapshot",
-      "Properties": {
-        "BackupRetentionPeriod": 7,
-        "CopyTagsToSnapshot": true,
-        "DBClusterIdentifier": "a2a-aurora",
-        "DBClusterParameterGroupName": "default.aurora-postgresql17",
-        "DBSubnetGroupName": {
-          "Ref": "A2AApiAuroraClusterSubnetsBB792379",
-        },
-        "DatabaseName": "a2a",
-        "DeletionProtection": true,
-        "Engine": "aurora-postgresql",
-        "EngineVersion": "17.5",
-        "MasterUserPassword": {
-          "Fn::Join": [
-            "",
-            [
-              "{{resolve:secretsmanager:",
-              {
-                "Ref": "a2aA2AApiAuroraClusterSecret19C3A7693fdaad7efa858a3daf9490cf0a702aeb",
-              },
-              ":SecretString:password::}}",
-            ],
-          ],
-        },
-        "MasterUsername": "stackone",
-        "Port": 5432,
-        "ServerlessV2ScalingConfiguration": {
-          "MaxCapacity": 2,
-          "MinCapacity": 0.5,
-        },
-        "StorageEncrypted": true,
-        "VpcSecurityGroupIds": [
-          {
-            "Fn::GetAtt": [
-              "A2AApiAuroraSGAF595F54",
-              "GroupId",
-            ],
-          },
-        ],
-      },
-      "Type": "AWS::RDS::DBCluster",
-      "UpdateReplacePolicy": "Snapshot",
-    },
-    "A2AApiAuroraClusterReader0EDBBCEF": {
-      "DeletionPolicy": "Delete",
-      "DependsOn": [
-        "A2AApiAuroraClusterWriter49FBDAC1",
-      ],
-      "Properties": {
-        "DBClusterIdentifier": {
-          "Ref": "A2AApiAuroraClusterC0CD99B7",
-        },
-        "DBInstanceClass": "db.serverless",
-        "DBInstanceIdentifier": "a2a-aurora-reader-1",
-        "EnablePerformanceInsights": true,
-        "Engine": "aurora-postgresql",
-        "PerformanceInsightsRetentionPeriod": 7,
-        "PromotionTier": 1,
-        "PubliclyAccessible": false,
-      },
-      "Type": "AWS::RDS::DBInstance",
-      "UpdateReplacePolicy": "Delete",
-    },
-    "A2AApiAuroraClusterSecretAttachment2925418A": {
-      "Properties": {
-        "SecretId": {
-          "Ref": "a2aA2AApiAuroraClusterSecret19C3A7693fdaad7efa858a3daf9490cf0a702aeb",
-        },
-        "TargetId": {
-          "Ref": "A2AApiAuroraClusterC0CD99B7",
-        },
-        "TargetType": "AWS::RDS::DBCluster",
-      },
-      "Type": "AWS::SecretsManager::SecretTargetAttachment",
-    },
-    "A2AApiAuroraClusterSubnetsBB792379": {
-      "Properties": {
-        "DBSubnetGroupDescription": "Subnets for ApiAuroraCluster database",
-        "SubnetIds": [
-          "p-12345",
-          "p-67890",
-        ],
-      },
-      "Type": "AWS::RDS::DBSubnetGroup",
-    },
-    "A2AApiAuroraClusterWriter49FBDAC1": {
-      "DeletionPolicy": "Delete",
-      "Properties": {
-        "AutoMinorVersionUpgrade": false,
-        "DBClusterIdentifier": {
-          "Ref": "A2AApiAuroraClusterC0CD99B7",
-        },
-        "DBInstanceClass": "db.serverless",
-        "DBInstanceIdentifier": "a2a-aurora-writer",
-        "EnablePerformanceInsights": true,
-        "Engine": "aurora-postgresql",
-        "PerformanceInsightsRetentionPeriod": 7,
-        "PromotionTier": 0,
-        "PubliclyAccessible": false,
-      },
-      "Type": "AWS::RDS::DBInstance",
-      "UpdateReplacePolicy": "Delete",
-    },
-    "A2AApiAuroraSGAF595F54": {
-      "Properties": {
-        "GroupDescription": "a2a/A2A/ApiAuroraSG",
-        "GroupName": "a2a-api-aurora-sg",
-        "SecurityGroupEgress": [
-          {
-            "CidrIp": "0.0.0.0/0",
-            "Description": "Allow all outbound traffic by default",
-            "IpProtocol": "-1",
-          },
-        ],
-        "VpcId": "vpc-12345",
-      },
-      "Type": "AWS::EC2::SecurityGroup",
-    },
-    "A2AApiAuroraSGfroma2aA2AApiSG5A5E14EFIndirectPort48A232CC": {
-      "Properties": {
-        "Description": "Allow API service to connect to Aurora",
-        "FromPort": {
-          "Fn::GetAtt": [
-            "A2AApiAuroraClusterC0CD99B7",
-            "Endpoint.Port",
-          ],
-        },
-        "GroupId": {
-          "Fn::GetAtt": [
-            "A2AApiAuroraSGAF595F54",
-            "GroupId",
-          ],
-        },
-        "IpProtocol": "tcp",
-        "SourceSecurityGroupId": {
-          "Fn::GetAtt": [
-            "A2AApiSG65F6B076",
-            "GroupId",
-          ],
-        },
-        "ToPort": {
-          "Fn::GetAtt": [
-            "A2AApiAuroraClusterC0CD99B7",
-            "Endpoint.Port",
-          ],
-        },
-      },
-      "Type": "AWS::EC2::SecurityGroupIngress",
-    },
-    "A2AApiAuroraSGfroma2aMigrationsMetabaseSecurityGroup5EC77BE5IndirectPortD6448521": {
-      "Properties": {
-        "Description": "Allow metabase task to connect to Aurora",
-        "FromPort": {
-          "Fn::GetAtt": [
-            "A2AApiAuroraClusterC0CD99B7",
-            "Endpoint.Port",
-          ],
-        },
-        "GroupId": {
-          "Fn::GetAtt": [
-            "A2AApiAuroraSGAF595F54",
-            "GroupId",
-          ],
-        },
-        "IpProtocol": "tcp",
-        "SourceSecurityGroupId": "sg-22222222222222222",
-        "ToPort": {
-          "Fn::GetAtt": [
-            "A2AApiAuroraClusterC0CD99B7",
-            "Endpoint.Port",
-          ],
-        },
-      },
-      "Type": "AWS::EC2::SecurityGroupIngress",
-    },
-    "A2AApiAuroraSGfroma2aMigrationsMigrationsTaskSecurityGroup9EA3C807IndirectPort9D761EB0": {
-      "Properties": {
-        "Description": "Allow migrations task to connect to Aurora",
-        "FromPort": {
-          "Fn::GetAtt": [
-            "A2AApiAuroraClusterC0CD99B7",
-            "Endpoint.Port",
-          ],
-        },
-        "GroupId": {
-          "Fn::GetAtt": [
-            "A2AApiAuroraSGAF595F54",
-            "GroupId",
-          ],
-        },
-        "IpProtocol": "tcp",
-        "SourceSecurityGroupId": {
-          "Fn::GetAtt": [
-            "MigrationsMigrationsTaskSecurityGroup1FBBCEAD",
-            "GroupId",
-          ],
-        },
-        "ToPort": {
-          "Fn::GetAtt": [
-            "A2AApiAuroraClusterC0CD99B7",
-            "Endpoint.Port",
-          ],
-        },
-      },
-      "Type": "AWS::EC2::SecurityGroupIngress",
-    },
-    "A2AApiDNSFE44F8D3": {
+    "A2aUiApiDNS24BDC05E": {
       "Properties": {
         "AliasTarget": {
           "DNSName": {
             "Fn::GetAtt": [
-              "A2AApiDistribution05136DF3",
+              "A2aUiApiDistributionBE66F9DA",
               "DomainName",
             ],
           },
@@ -310,12 +71,12 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
           },
         },
         "HostedZoneId": "DUMMY",
-        "Name": "a2a.stackone-exp.com.",
+        "Name": "a2a-ui.stackone-exp.com.",
         "Type": "A",
       },
       "Type": "AWS::Route53::RecordSet",
     },
-    "A2AApiDistribution05136DF3": {
+    "A2aUiApiDistributionBE66F9DA": {
       "Properties": {
         "DistributionConfig": {
           "Aliases": [
@@ -334,7 +95,7 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
             "CachePolicyId": "4135ea2d-6df8-44a3-9df3-4b5a84be39ad",
             "Compress": true,
             "OriginRequestPolicyId": "216adef6-5c7f-47e4-b989-5492eafa07d3",
-            "TargetOriginId": "a2aA2AApiDistributionOrigin1C7AABD75",
+            "TargetOriginId": "a2auiA2aUiApiDistributionOrigin1C53FED73",
             "ViewerProtocolPolicy": "redirect-to-https",
           },
           "Enabled": true,
@@ -350,11 +111,11 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
               },
               "DomainName": {
                 "Fn::GetAtt": [
-                  "A2AFargateServiceLBF5697ECA",
+                  "A2aUiFargateServiceLBF3F8D114",
                   "DNSName",
                 ],
               },
-              "Id": "a2aA2AApiDistributionOrigin1C7AABD75",
+              "Id": "a2auiA2aUiApiDistributionOrigin1C53FED73",
             },
           ],
           "ViewerCertificate": {
@@ -367,10 +128,10 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
       },
       "Type": "AWS::CloudFront::Distribution",
     },
-    "A2AApiSG65F6B076": {
+    "A2aUiApiSGE3AD0CFC": {
       "Properties": {
-        "GroupDescription": "a2a/A2A/ApiSG",
-        "GroupName": "a2a-api-api-sg",
+        "GroupDescription": "a2a-ui/A2aUi/ApiSG",
+        "GroupName": "a2a-ui-a2a-ui-sg",
         "SecurityGroupEgress": [
           {
             "CidrIp": "0.0.0.0/0",
@@ -382,33 +143,33 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
       },
       "Type": "AWS::EC2::SecurityGroup",
     },
-    "A2AApiSGfroma2aA2AFargateServiceLBSecurityGroupFC5CBA0540807E49EE91": {
+    "A2aUiApiSGfroma2auiA2aUiFargateServiceLBSecurityGroup57DBE99F30006DFA4AE3": {
       "Properties": {
         "Description": "Load balancer to target",
-        "FromPort": 4080,
+        "FromPort": 3000,
         "GroupId": {
           "Fn::GetAtt": [
-            "A2AApiSG65F6B076",
+            "A2aUiApiSGE3AD0CFC",
             "GroupId",
           ],
         },
         "IpProtocol": "tcp",
         "SourceSecurityGroupId": {
           "Fn::GetAtt": [
-            "A2AFargateServiceLBSecurityGroup46E8328F",
+            "A2aUiFargateServiceLBSecurityGroup3D7D3028",
             "GroupId",
           ],
         },
-        "ToPort": 4080,
+        "ToPort": 3000,
       },
       "Type": "AWS::EC2::SecurityGroupIngress",
     },
-    "A2AFargateService48A77222": {
+    "A2aUiFargateServiceBE1D5F3D": {
       "DependsOn": [
-        "A2AFargateServiceLBPublicListenerECSGroup2413F861",
-        "A2AFargateServiceLBPublicListenerB2F59A94",
-        "A2ARoleDefaultPolicy09AEC145",
-        "A2ARole980A1415",
+        "A2aUiFargateServiceLBPublicListenerECSGroupF6100B60",
+        "A2aUiFargateServiceLBPublicListener44FD8763",
+        "A2aUiRoleDefaultPolicy56621E68",
+        "A2aUiRole1BDF4470",
       ],
       "Properties": {
         "Cluster": {
@@ -423,17 +184,17 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
           "MaximumPercent": 200,
           "MinimumHealthyPercent": 50,
         },
-        "DesiredCount": 2,
+        "DesiredCount": 1,
         "EnableECSManagedTags": true,
         "EnableExecuteCommand": true,
         "HealthCheckGracePeriodSeconds": 120,
         "LaunchType": "FARGATE",
         "LoadBalancers": [
           {
-            "ContainerName": "a2a-api",
-            "ContainerPort": 4080,
+            "ContainerName": "a2a",
+            "ContainerPort": 3000,
             "TargetGroupArn": {
-              "Ref": "A2AFargateServiceLBPublicListenerECSGroup2413F861",
+              "Ref": "A2aUiFargateServiceLBPublicListenerECSGroupF6100B60",
             },
           },
         ],
@@ -443,7 +204,7 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
             "SecurityGroups": [
               {
                 "Fn::GetAtt": [
-                  "A2AApiSG65F6B076",
+                  "A2aUiApiSGE3AD0CFC",
                   "GroupId",
                 ],
               },
@@ -457,12 +218,12 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
         "PropagateTags": "SERVICE",
         "ServiceName": "api",
         "TaskDefinition": {
-          "Ref": "A2AFargateServiceTaskDefFDBD79E9",
+          "Ref": "A2aUiFargateServiceTaskDefF9BAEAFF",
         },
       },
       "Type": "AWS::ECS::Service",
     },
-    "A2AFargateServiceLBF5697ECA": {
+    "A2aUiFargateServiceLBF3F8D114": {
       "Properties": {
         "LoadBalancerAttributes": [
           {
@@ -474,7 +235,7 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
         "SecurityGroups": [
           {
             "Fn::GetAtt": [
-              "A2AFargateServiceLBSecurityGroup46E8328F",
+              "A2aUiFargateServiceLBSecurityGroup3D7D3028",
               "GroupId",
             ],
           },
@@ -487,7 +248,7 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
       },
       "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
     },
-    "A2AFargateServiceLBPublicListenerB2F59A94": {
+    "A2aUiFargateServiceLBPublicListener44FD8763": {
       "Properties": {
         "Certificates": [
           {
@@ -497,13 +258,13 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
         "DefaultActions": [
           {
             "TargetGroupArn": {
-              "Ref": "A2AFargateServiceLBPublicListenerECSGroup2413F861",
+              "Ref": "A2aUiFargateServiceLBPublicListenerECSGroupF6100B60",
             },
             "Type": "forward",
           },
         ],
         "LoadBalancerArn": {
-          "Ref": "A2AFargateServiceLBF5697ECA",
+          "Ref": "A2aUiFargateServiceLBF3F8D114",
         },
         "Port": 443,
         "Protocol": "HTTPS",
@@ -511,10 +272,10 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
       },
       "Type": "AWS::ElasticLoadBalancingV2::Listener",
     },
-    "A2AFargateServiceLBPublicListenerECSGroup2413F861": {
+    "A2aUiFargateServiceLBPublicListenerECSGroupF6100B60": {
       "Properties": {
         "HealthCheckIntervalSeconds": 10,
-        "HealthCheckPath": "/healthz",
+        "HealthCheckPath": "/api/health",
         "HealthCheckTimeoutSeconds": 5,
         "HealthyThresholdCount": 2,
         "Matcher": {
@@ -534,10 +295,10 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
       },
       "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
     },
-    "A2AFargateServiceLBPublicRedirectListenerCEA0FCBB": {
+    "A2aUiFargateServiceLBPublicRedirectListenerDB2E96FD": {
       "DependsOn": [
-        "A2AFargateServiceLBPublicListenerECSGroup2413F861",
-        "A2AFargateServiceLBPublicListenerB2F59A94",
+        "A2aUiFargateServiceLBPublicListenerECSGroupF6100B60",
+        "A2aUiFargateServiceLBPublicListener44FD8763",
       ],
       "Properties": {
         "DefaultActions": [
@@ -551,16 +312,16 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
           },
         ],
         "LoadBalancerArn": {
-          "Ref": "A2AFargateServiceLBF5697ECA",
+          "Ref": "A2aUiFargateServiceLBF3F8D114",
         },
         "Port": 80,
         "Protocol": "HTTP",
       },
       "Type": "AWS::ElasticLoadBalancingV2::Listener",
     },
-    "A2AFargateServiceLBSecurityGroup46E8328F": {
+    "A2aUiFargateServiceLBSecurityGroup3D7D3028": {
       "Properties": {
-        "GroupDescription": "Automatically created Security Group for ELB a2aA2AFargateServiceLBC1542D64",
+        "GroupDescription": "Automatically created Security Group for ELB a2auiA2aUiFargateServiceLB742CCBE3",
         "SecurityGroupIngress": [
           {
             "CidrIp": "0.0.0.0/0",
@@ -581,28 +342,28 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
       },
       "Type": "AWS::EC2::SecurityGroup",
     },
-    "A2AFargateServiceLBSecurityGrouptoa2aA2AApiSG5A5E14EF4080D0BDD83A": {
+    "A2aUiFargateServiceLBSecurityGrouptoa2auiA2aUiApiSGF656E7293000EF93E2F4": {
       "Properties": {
         "Description": "Load balancer to target",
         "DestinationSecurityGroupId": {
           "Fn::GetAtt": [
-            "A2AApiSG65F6B076",
+            "A2aUiApiSGE3AD0CFC",
             "GroupId",
           ],
         },
-        "FromPort": 4080,
+        "FromPort": 3000,
         "GroupId": {
           "Fn::GetAtt": [
-            "A2AFargateServiceLBSecurityGroup46E8328F",
+            "A2aUiFargateServiceLBSecurityGroup3D7D3028",
             "GroupId",
           ],
         },
         "IpProtocol": "tcp",
-        "ToPort": 4080,
+        "ToPort": 3000,
       },
       "Type": "AWS::EC2::SecurityGroupEgress",
     },
-    "A2AFargateServiceTaskDefFDBD79E9": {
+    "A2aUiFargateServiceTaskDefF9BAEAFF": {
       "Properties": {
         "ContainerDefinitions": [
           {
@@ -612,38 +373,8 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
                 "Value": "staging",
               },
               {
-                "Name": "DATABASE_HOST",
-                "Value": {
-                  "Fn::GetAtt": [
-                    "A2AApiAuroraClusterC0CD99B7",
-                    "Endpoint.Address",
-                  ],
-                },
-              },
-              {
-                "Name": "DATABASE_PORT",
-                "Value": {
-                  "Fn::GetAtt": [
-                    "A2AApiAuroraClusterC0CD99B7",
-                    "Endpoint.Port",
-                  ],
-                },
-              },
-              {
-                "Name": "DATABASE_NAME",
-                "Value": "a2a",
-              },
-              {
-                "Name": "STACKONE_API_URL",
-                "Value": "https://api.stackone-dev.com/",
-              },
-              {
-                "Name": "STACKONE_A2A_URL",
-                "Value": "https://a2a.stackone-dev.com/",
-              },
-              {
                 "Name": "LISTEN_PORT",
-                "Value": "4080",
+                "Value": "3000",
               },
             ],
             "Essential": true,
@@ -655,7 +386,7 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
                   {
                     "Ref": "AWS::URLSuffix",
                   },
-                  "/a2a/api:latest",
+                  "/a2a/a2a-ui:latest",
                 ],
               ],
             },
@@ -665,9 +396,9 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
                 "Host": "http-intake.logs.datadoghq.eu",
                 "Name": "datadog",
                 "TLS": "on",
-                "dd_service": "a2a-api",
+                "dd_service": "a2a-ui",
                 "dd_source": "ecs",
-                "dd_tags": "env:staging,region:region,component:a2a-api",
+                "dd_tags": "env:staging,region:region,component:a2a-ui",
                 "provider": "ecs",
                 "retry_limit": "2",
               },
@@ -678,45 +409,11 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
                 },
               ],
             },
-            "Name": "a2a-api",
+            "Name": "a2a",
             "PortMappings": [
               {
-                "ContainerPort": 4080,
+                "ContainerPort": 3000,
                 "Protocol": "tcp",
-              },
-            ],
-            "Secrets": [
-              {
-                "Name": "DATABASE_USERNAME",
-                "ValueFrom": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      {
-                        "Ref": "A2AApiAuroraClusterSecretAttachment2925418A",
-                      },
-                      ":username::",
-                    ],
-                  ],
-                },
-              },
-              {
-                "Name": "DATABASE_PASSWORD",
-                "ValueFrom": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      {
-                        "Ref": "A2AApiAuroraClusterSecretAttachment2925418A",
-                      },
-                      ":password::",
-                    ],
-                  ],
-                },
-              },
-              {
-                "Name": "STACKONE_API_KEY",
-                "ValueFrom": "arn:aws:secretsmanager:eu-west-2:553332017094:secret:a2a/service-secrets-gRFMUd:stackone_api_key::",
               },
             ],
           },
@@ -732,7 +429,7 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
               "LogDriver": "awslogs",
               "Options": {
                 "awslogs-group": {
-                  "Ref": "A2AFargateServiceTaskDeflogrouterLogGroupA378BA46",
+                  "Ref": "A2aUiFargateServiceTaskDeflogrouterLogGroup0F9FF23D",
                 },
                 "awslogs-region": "region",
                 "awslogs-stream-prefix": "firelens",
@@ -745,11 +442,11 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
         "Cpu": "512",
         "ExecutionRoleArn": {
           "Fn::GetAtt": [
-            "A2ARole980A1415",
+            "A2aUiRole1BDF4470",
             "Arn",
           ],
         },
-        "Family": "a2a-api",
+        "Family": "a2a-ui",
         "Memory": "1024",
         "NetworkMode": "awsvpc",
         "RequiresCompatibilities": [
@@ -757,19 +454,19 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
         ],
         "TaskRoleArn": {
           "Fn::GetAtt": [
-            "A2ARole980A1415",
+            "A2aUiRole1BDF4470",
             "Arn",
           ],
         },
       },
       "Type": "AWS::ECS::TaskDefinition",
     },
-    "A2AFargateServiceTaskDeflogrouterLogGroupA378BA46": {
+    "A2aUiFargateServiceTaskDeflogrouterLogGroup0F9FF23D": {
       "DeletionPolicy": "Retain",
       "Type": "AWS::Logs::LogGroup",
       "UpdateReplacePolicy": "Retain",
     },
-    "A2ARole980A1415": {
+    "A2aUiRole1BDF4470": {
       "Properties": {
         "AssumeRolePolicyDocument": {
           "Statement": [
@@ -797,8 +494,6 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
                     "logs:CreateLogStream",
                     "logs:PutLogEvents",
                     "logs:DescribeLogStreams",
-                    "secretsmanager:GetSecretValue",
-                    "kms:Decrypt",
                   ],
                   "Effect": "Allow",
                   "Resource": "*",
@@ -812,13 +507,13 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
         "Tags": [
           {
             "Key": "aws-cdk:id",
-            "Value": "a2a_c84f778dd8a931c9564c2ff4f11c47ddf0ecb5155b",
+            "Value": "a2a-ui_c8dad2d593bd3acb8767464a30c78c651b78ed107b",
           },
         ],
       },
       "Type": "AWS::IAM::Role",
     },
-    "A2ARoleDefaultPolicy09AEC145": {
+    "A2aUiRoleDefaultPolicy56621E68": {
       "Properties": {
         "PolicyDocument": {
           "Statement": [
@@ -829,7 +524,7 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
                 "ecr:BatchGetImage",
               ],
               "Effect": "Allow",
-              "Resource": "arn:aws:ecr:eu-west-2:553332017094:repository/a2a/api",
+              "Resource": "arn:aws:ecr:eu-west-2:553332017094:repository/a2a/a2a-ui",
             },
             {
               "Action": "ecr:GetAuthorizationToken",
@@ -843,24 +538,6 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
               ],
               "Effect": "Allow",
               "Resource": "arn:aws:secretsmanager:eu-west-2:553332017094:secret:DdApiKeySecret-FDLILY",
-            },
-            {
-              "Action": [
-                "secretsmanager:GetSecretValue",
-                "secretsmanager:DescribeSecret",
-              ],
-              "Effect": "Allow",
-              "Resource": {
-                "Ref": "A2AApiAuroraClusterSecretAttachment2925418A",
-              },
-            },
-            {
-              "Action": [
-                "secretsmanager:GetSecretValue",
-                "secretsmanager:DescribeSecret",
-              ],
-              "Effect": "Allow",
-              "Resource": "arn:aws:secretsmanager:eu-west-2:553332017094:secret:a2a/service-secrets-gRFMUd",
             },
             {
               "Action": [
@@ -904,7 +581,7 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
               "Effect": "Allow",
               "Resource": {
                 "Fn::GetAtt": [
-                  "A2AFargateServiceTaskDeflogrouterLogGroupA378BA46",
+                  "A2aUiFargateServiceTaskDeflogrouterLogGroup0F9FF23D",
                   "Arn",
                 ],
               },
@@ -912,10 +589,10 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
           ],
           "Version": "2012-10-17",
         },
-        "PolicyName": "A2ARoleDefaultPolicy09AEC145",
+        "PolicyName": "A2aUiRoleDefaultPolicy56621E68",
         "Roles": [
           {
-            "Ref": "A2ARole980A1415",
+            "Ref": "A2aUiRole1BDF4470",
           },
         ],
       },
@@ -932,347 +609,6 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
         ],
       },
       "Type": "AWS::ECS::Cluster",
-    },
-    "MigrationsMigrationsTaskDefinition88166088": {
-      "Properties": {
-        "ContainerDefinitions": [
-          {
-            "Command": [
-              "migrate",
-            ],
-            "Environment": [
-              {
-                "Name": "ENV",
-                "Value": "staging",
-              },
-              {
-                "Name": "DATABASE_HOST",
-                "Value": {
-                  "Fn::GetAtt": [
-                    "A2AApiAuroraClusterC0CD99B7",
-                    "Endpoint.Address",
-                  ],
-                },
-              },
-              {
-                "Name": "DATABASE_PORT",
-                "Value": {
-                  "Fn::GetAtt": [
-                    "A2AApiAuroraClusterC0CD99B7",
-                    "Endpoint.Port",
-                  ],
-                },
-              },
-              {
-                "Name": "DATABASE_NAME",
-                "Value": "a2a",
-              },
-            ],
-            "Essential": true,
-            "Image": {
-              "Fn::Join": [
-                "",
-                [
-                  "553332017094.dkr.ecr.eu-west-2.",
-                  {
-                    "Ref": "AWS::URLSuffix",
-                  },
-                  "/a2a/api:latest",
-                ],
-              ],
-            },
-            "LogConfiguration": {
-              "LogDriver": "awsfirelens",
-              "Options": {
-                "Host": "http-intake.logs.datadoghq.eu",
-                "Name": "datadog",
-                "TLS": "on",
-                "dd_service": "a2a-migrations",
-                "dd_source": "ecs",
-                "dd_tags": "env:staging,region:region,component:a2a-migrations",
-                "provider": "ecs",
-                "retry_limit": "2",
-              },
-              "SecretOptions": [
-                {
-                  "Name": "apikey",
-                  "ValueFrom": "arn:aws:secretsmanager:eu-west-2:553332017094:secret:DdApiKeySecret-FDLILY",
-                },
-              ],
-            },
-            "Name": "migrations-container",
-            "Secrets": [
-              {
-                "Name": "DATABASE_USERNAME",
-                "ValueFrom": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      {
-                        "Ref": "A2AApiAuroraClusterSecretAttachment2925418A",
-                      },
-                      ":username::",
-                    ],
-                  ],
-                },
-              },
-              {
-                "Name": "DATABASE_PASSWORD",
-                "ValueFrom": {
-                  "Fn::Join": [
-                    "",
-                    [
-                      {
-                        "Ref": "A2AApiAuroraClusterSecretAttachment2925418A",
-                      },
-                      ":password::",
-                    ],
-                  ],
-                },
-              },
-            ],
-          },
-          {
-            "Essential": true,
-            "FirelensConfiguration": {
-              "Type": "fluentbit",
-            },
-            "Image": {
-              "Ref": "SsmParameterValueawsserviceawsforfluentbitlatestC96584B6F00A464EAD1953AFF4B05118Parameter",
-            },
-            "LogConfiguration": {
-              "LogDriver": "awslogs",
-              "Options": {
-                "awslogs-group": {
-                  "Ref": "MigrationsMigrationsTaskDefinitionlogrouterLogGroupB3D7166B",
-                },
-                "awslogs-region": "region",
-                "awslogs-stream-prefix": "firelens",
-              },
-            },
-            "MemoryReservation": 50,
-            "Name": "log-router",
-          },
-        ],
-        "Cpu": "256",
-        "ExecutionRoleArn": {
-          "Fn::GetAtt": [
-            "MigrationsMigrationsTaskExecutionRoleC7162B6B",
-            "Arn",
-          ],
-        },
-        "Family": "migrations",
-        "Memory": "512",
-        "NetworkMode": "awsvpc",
-        "RequiresCompatibilities": [
-          "FARGATE",
-        ],
-        "TaskRoleArn": {
-          "Fn::GetAtt": [
-            "MigrationsMigrationsTaskRoleD46866FE",
-            "Arn",
-          ],
-        },
-      },
-      "Type": "AWS::ECS::TaskDefinition",
-    },
-    "MigrationsMigrationsTaskDefinitionlogrouterLogGroupB3D7166B": {
-      "DeletionPolicy": "Retain",
-      "Type": "AWS::Logs::LogGroup",
-      "UpdateReplacePolicy": "Retain",
-    },
-    "MigrationsMigrationsTaskExecutionRoleC7162B6B": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "ecs-tasks.amazonaws.com",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "ManagedPolicyArns": [
-          {
-            "Fn::Join": [
-              "",
-              [
-                "arn:",
-                {
-                  "Ref": "AWS::Partition",
-                },
-                ":iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
-              ],
-            ],
-          },
-        ],
-        "Tags": [
-          {
-            "Key": "aws-cdk:id",
-            "Value": "a2a_c8e8a0d4fc4af3c19fa838d0816a068c4ae59319f0",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "MigrationsMigrationsTaskExecutionRoleDefaultPolicy99EB9372": {
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "ecr:BatchCheckLayerAvailability",
-                "ecr:GetDownloadUrlForLayer",
-                "ecr:BatchGetImage",
-              ],
-              "Effect": "Allow",
-              "Resource": "arn:aws:ecr:eu-west-2:553332017094:repository/a2a/api",
-            },
-            {
-              "Action": "ecr:GetAuthorizationToken",
-              "Effect": "Allow",
-              "Resource": "*",
-            },
-            {
-              "Action": [
-                "secretsmanager:GetSecretValue",
-                "secretsmanager:DescribeSecret",
-              ],
-              "Effect": "Allow",
-              "Resource": "arn:aws:secretsmanager:eu-west-2:553332017094:secret:DdApiKeySecret-FDLILY",
-            },
-            {
-              "Action": [
-                "secretsmanager:GetSecretValue",
-                "secretsmanager:DescribeSecret",
-              ],
-              "Effect": "Allow",
-              "Resource": {
-                "Ref": "A2AApiAuroraClusterSecretAttachment2925418A",
-              },
-            },
-            {
-              "Action": [
-                "ecr:GetAuthorizationToken",
-                "ecr:BatchCheckLayerAvailability",
-                "ecr:GetDownloadUrlForLayer",
-                "ecr:BatchGetImage",
-              ],
-              "Effect": "Allow",
-              "Resource": "*",
-            },
-            {
-              "Action": [
-                "logs:CreateLogStream",
-                "logs:PutLogEvents",
-              ],
-              "Effect": "Allow",
-              "Resource": {
-                "Fn::GetAtt": [
-                  "MigrationsMigrationsTaskDefinitionlogrouterLogGroupB3D7166B",
-                  "Arn",
-                ],
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "MigrationsMigrationsTaskExecutionRoleDefaultPolicy99EB9372",
-        "Roles": [
-          {
-            "Ref": "MigrationsMigrationsTaskExecutionRoleC7162B6B",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Policy",
-    },
-    "MigrationsMigrationsTaskRoleD46866FE": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "ecs-tasks.amazonaws.com",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "MigrationsMigrationsTaskRoleDefaultPolicy1F68A476": {
-      "Properties": {
-        "PolicyDocument": {
-          "Statement": [
-            {
-              "Action": [
-                "secretsmanager:GetSecretValue",
-                "secretsmanager:DescribeSecret",
-                "kms:Decrypt",
-                "kms:DescribeKey",
-                "kms:GenerateDataKey",
-              ],
-              "Effect": "Allow",
-              "Resource": {
-                "Ref": "A2AApiAuroraClusterSecretAttachment2925418A",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "PolicyName": "MigrationsMigrationsTaskRoleDefaultPolicy1F68A476",
-        "Roles": [
-          {
-            "Ref": "MigrationsMigrationsTaskRoleD46866FE",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Policy",
-    },
-    "MigrationsMigrationsTaskSecurityGroup1FBBCEAD": {
-      "Properties": {
-        "GroupDescription": "Security group for the migration task",
-        "SecurityGroupEgress": [
-          {
-            "CidrIp": "0.0.0.0/0",
-            "Description": "Allow all outbound traffic by default",
-            "IpProtocol": "-1",
-          },
-        ],
-        "VpcId": "vpc-12345",
-      },
-      "Type": "AWS::EC2::SecurityGroup",
-    },
-    "a2aA2AApiAuroraClusterSecret19C3A7693fdaad7efa858a3daf9490cf0a702aeb": {
-      "DeletionPolicy": "Delete",
-      "Properties": {
-        "Description": {
-          "Fn::Join": [
-            "",
-            [
-              "Generated by the CDK for stack: ",
-              {
-                "Ref": "AWS::StackName",
-              },
-            ],
-          ],
-        },
-        "GenerateSecretString": {
-          "ExcludeCharacters": " %+~\`#$&*()|[]{}:;<>?!'/@"\\",
-          "GenerateStringKey": "password",
-          "PasswordLength": 30,
-          "SecretStringTemplate": "{"username":"stackone"}",
-        },
-        "Name": "a2a/aurora-credentials",
-      },
-      "Type": "AWS::SecretsManager::Secret",
-      "UpdateReplacePolicy": "Delete",
     },
   },
   "Rules": {
