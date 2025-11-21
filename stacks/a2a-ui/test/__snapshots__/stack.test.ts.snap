@@ -14,15 +14,15 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
     },
   },
   "Outputs": {
-    "A2aUiFargateServiceLoadBalancerDNS9B2EB5F7": {
+    "A2AUIFargateServiceLoadBalancerDNS9F84DC4E": {
       "Value": {
         "Fn::GetAtt": [
-          "A2aUiFargateServiceLBF3F8D114",
+          "A2AUIFargateServiceLB20217DD7",
           "DNSName",
         ],
       },
     },
-    "A2aUiFargateServiceServiceURL9F7F5F9D": {
+    "A2AUIFargateServiceServiceURL82762AF1": {
       "Value": {
         "Fn::Join": [
           "",
@@ -30,7 +30,7 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
             "https://",
             {
               "Fn::GetAtt": [
-                "A2aUiFargateServiceLBF3F8D114",
+                "A2AUIFargateServiceLB20217DD7",
                 "DNSName",
               ],
             },
@@ -51,12 +51,12 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
     },
   },
   "Resources": {
-    "A2aUiApiDNS24BDC05E": {
+    "A2AUIApiDNS7F12E3D2": {
       "Properties": {
         "AliasTarget": {
           "DNSName": {
             "Fn::GetAtt": [
-              "A2aUiApiDistributionBE66F9DA",
+              "A2AUIApiDistribution5F938E49",
               "DomainName",
             ],
           },
@@ -76,11 +76,11 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
       },
       "Type": "AWS::Route53::RecordSet",
     },
-    "A2aUiApiDistributionBE66F9DA": {
+    "A2AUIApiDistribution5F938E49": {
       "Properties": {
         "DistributionConfig": {
           "Aliases": [
-            "a2a.stackone-exp.com",
+            "a2a-ui.stackone-exp.com",
           ],
           "DefaultCacheBehavior": {
             "AllowedMethods": [
@@ -95,7 +95,7 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
             "CachePolicyId": "4135ea2d-6df8-44a3-9df3-4b5a84be39ad",
             "Compress": true,
             "OriginRequestPolicyId": "216adef6-5c7f-47e4-b989-5492eafa07d3",
-            "TargetOriginId": "a2auiA2aUiApiDistributionOrigin1C53FED73",
+            "TargetOriginId": "a2auiA2AUIApiDistributionOrigin188C111F8",
             "ViewerProtocolPolicy": "redirect-to-https",
           },
           "Enabled": true,
@@ -111,11 +111,11 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
               },
               "DomainName": {
                 "Fn::GetAtt": [
-                  "A2aUiFargateServiceLBF3F8D114",
+                  "A2AUIFargateServiceLB20217DD7",
                   "DNSName",
                 ],
               },
-              "Id": "a2auiA2aUiApiDistributionOrigin1C53FED73",
+              "Id": "a2auiA2AUIApiDistributionOrigin188C111F8",
             },
           ],
           "ViewerCertificate": {
@@ -128,9 +128,9 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
       },
       "Type": "AWS::CloudFront::Distribution",
     },
-    "A2aUiApiSGE3AD0CFC": {
+    "A2AUIApiSGA9518CF2": {
       "Properties": {
-        "GroupDescription": "a2a-ui/A2aUi/ApiSG",
+        "GroupDescription": "a2a-ui/A2AUI/ApiSG",
         "GroupName": "a2a-ui-a2a-ui-sg",
         "SecurityGroupEgress": [
           {
@@ -143,20 +143,20 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
       },
       "Type": "AWS::EC2::SecurityGroup",
     },
-    "A2aUiApiSGfroma2auiA2aUiFargateServiceLBSecurityGroup57DBE99F30006DFA4AE3": {
+    "A2AUIApiSGfroma2auiA2AUIFargateServiceLBSecurityGroup8DBA4B6D3000BFFACE2F": {
       "Properties": {
         "Description": "Load balancer to target",
         "FromPort": 3000,
         "GroupId": {
           "Fn::GetAtt": [
-            "A2aUiApiSGE3AD0CFC",
+            "A2AUIApiSGA9518CF2",
             "GroupId",
           ],
         },
         "IpProtocol": "tcp",
         "SourceSecurityGroupId": {
           "Fn::GetAtt": [
-            "A2aUiFargateServiceLBSecurityGroup3D7D3028",
+            "A2AUIFargateServiceLBSecurityGroupB952F232",
             "GroupId",
           ],
         },
@@ -164,12 +164,12 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
       },
       "Type": "AWS::EC2::SecurityGroupIngress",
     },
-    "A2aUiFargateServiceBE1D5F3D": {
+    "A2AUIFargateService714B5DE4": {
       "DependsOn": [
-        "A2aUiFargateServiceLBPublicListenerECSGroupF6100B60",
-        "A2aUiFargateServiceLBPublicListener44FD8763",
-        "A2aUiRoleDefaultPolicy56621E68",
-        "A2aUiRole1BDF4470",
+        "A2AUIFargateServiceLBPublicListenerECSGroupAF0F5215",
+        "A2AUIFargateServiceLBPublicListenerF4453D28",
+        "A2AUIRoleDefaultPolicy75548887",
+        "A2AUIRoleFA9232DA",
       ],
       "Properties": {
         "Cluster": {
@@ -194,7 +194,7 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
             "ContainerName": "a2a",
             "ContainerPort": 3000,
             "TargetGroupArn": {
-              "Ref": "A2aUiFargateServiceLBPublicListenerECSGroupF6100B60",
+              "Ref": "A2AUIFargateServiceLBPublicListenerECSGroupAF0F5215",
             },
           },
         ],
@@ -204,7 +204,7 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
             "SecurityGroups": [
               {
                 "Fn::GetAtt": [
-                  "A2aUiApiSGE3AD0CFC",
+                  "A2AUIApiSGA9518CF2",
                   "GroupId",
                 ],
               },
@@ -218,12 +218,12 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
         "PropagateTags": "SERVICE",
         "ServiceName": "api",
         "TaskDefinition": {
-          "Ref": "A2aUiFargateServiceTaskDefF9BAEAFF",
+          "Ref": "A2AUIFargateServiceTaskDef601A53BF",
         },
       },
       "Type": "AWS::ECS::Service",
     },
-    "A2aUiFargateServiceLBF3F8D114": {
+    "A2AUIFargateServiceLB20217DD7": {
       "Properties": {
         "LoadBalancerAttributes": [
           {
@@ -235,7 +235,7 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
         "SecurityGroups": [
           {
             "Fn::GetAtt": [
-              "A2aUiFargateServiceLBSecurityGroup3D7D3028",
+              "A2AUIFargateServiceLBSecurityGroupB952F232",
               "GroupId",
             ],
           },
@@ -248,31 +248,7 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
       },
       "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
     },
-    "A2aUiFargateServiceLBPublicListener44FD8763": {
-      "Properties": {
-        "Certificates": [
-          {
-            "CertificateArn": "arn:aws:acm:eu-west-2:553332017094:certificate/4d66a426-7102-4852-91fb-1ba8274f50c2",
-          },
-        ],
-        "DefaultActions": [
-          {
-            "TargetGroupArn": {
-              "Ref": "A2aUiFargateServiceLBPublicListenerECSGroupF6100B60",
-            },
-            "Type": "forward",
-          },
-        ],
-        "LoadBalancerArn": {
-          "Ref": "A2aUiFargateServiceLBF3F8D114",
-        },
-        "Port": 443,
-        "Protocol": "HTTPS",
-        "SslPolicy": "ELBSecurityPolicy-TLS13-1-2-2021-06",
-      },
-      "Type": "AWS::ElasticLoadBalancingV2::Listener",
-    },
-    "A2aUiFargateServiceLBPublicListenerECSGroupF6100B60": {
+    "A2AUIFargateServiceLBPublicListenerECSGroupAF0F5215": {
       "Properties": {
         "HealthCheckIntervalSeconds": 10,
         "HealthCheckPath": "/api/health",
@@ -295,10 +271,34 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
       },
       "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
     },
-    "A2aUiFargateServiceLBPublicRedirectListenerDB2E96FD": {
+    "A2AUIFargateServiceLBPublicListenerF4453D28": {
+      "Properties": {
+        "Certificates": [
+          {
+            "CertificateArn": "arn:aws:acm:eu-west-2:553332017094:certificate/4d66a426-7102-4852-91fb-1ba8274f50c2",
+          },
+        ],
+        "DefaultActions": [
+          {
+            "TargetGroupArn": {
+              "Ref": "A2AUIFargateServiceLBPublicListenerECSGroupAF0F5215",
+            },
+            "Type": "forward",
+          },
+        ],
+        "LoadBalancerArn": {
+          "Ref": "A2AUIFargateServiceLB20217DD7",
+        },
+        "Port": 443,
+        "Protocol": "HTTPS",
+        "SslPolicy": "ELBSecurityPolicy-TLS13-1-2-2021-06",
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+    },
+    "A2AUIFargateServiceLBPublicRedirectListener63928D8F": {
       "DependsOn": [
-        "A2aUiFargateServiceLBPublicListenerECSGroupF6100B60",
-        "A2aUiFargateServiceLBPublicListener44FD8763",
+        "A2AUIFargateServiceLBPublicListenerECSGroupAF0F5215",
+        "A2AUIFargateServiceLBPublicListenerF4453D28",
       ],
       "Properties": {
         "DefaultActions": [
@@ -312,16 +312,16 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
           },
         ],
         "LoadBalancerArn": {
-          "Ref": "A2aUiFargateServiceLBF3F8D114",
+          "Ref": "A2AUIFargateServiceLB20217DD7",
         },
         "Port": 80,
         "Protocol": "HTTP",
       },
       "Type": "AWS::ElasticLoadBalancingV2::Listener",
     },
-    "A2aUiFargateServiceLBSecurityGroup3D7D3028": {
+    "A2AUIFargateServiceLBSecurityGroupB952F232": {
       "Properties": {
-        "GroupDescription": "Automatically created Security Group for ELB a2auiA2aUiFargateServiceLB742CCBE3",
+        "GroupDescription": "Automatically created Security Group for ELB a2auiA2AUIFargateServiceLBC1B2671F",
         "SecurityGroupIngress": [
           {
             "CidrIp": "0.0.0.0/0",
@@ -342,19 +342,19 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
       },
       "Type": "AWS::EC2::SecurityGroup",
     },
-    "A2aUiFargateServiceLBSecurityGrouptoa2auiA2aUiApiSGF656E7293000EF93E2F4": {
+    "A2AUIFargateServiceLBSecurityGrouptoa2auiA2AUIApiSG9799B4E230003995C09C": {
       "Properties": {
         "Description": "Load balancer to target",
         "DestinationSecurityGroupId": {
           "Fn::GetAtt": [
-            "A2aUiApiSGE3AD0CFC",
+            "A2AUIApiSGA9518CF2",
             "GroupId",
           ],
         },
         "FromPort": 3000,
         "GroupId": {
           "Fn::GetAtt": [
-            "A2aUiFargateServiceLBSecurityGroup3D7D3028",
+            "A2AUIFargateServiceLBSecurityGroupB952F232",
             "GroupId",
           ],
         },
@@ -363,7 +363,7 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
       },
       "Type": "AWS::EC2::SecurityGroupEgress",
     },
-    "A2aUiFargateServiceTaskDefF9BAEAFF": {
+    "A2AUIFargateServiceTaskDef601A53BF": {
       "Properties": {
         "ContainerDefinitions": [
           {
@@ -429,7 +429,7 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
               "LogDriver": "awslogs",
               "Options": {
                 "awslogs-group": {
-                  "Ref": "A2aUiFargateServiceTaskDeflogrouterLogGroup0F9FF23D",
+                  "Ref": "A2AUIFargateServiceTaskDeflogrouterLogGroup45BA7422",
                 },
                 "awslogs-region": "region",
                 "awslogs-stream-prefix": "firelens",
@@ -442,7 +442,7 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
         "Cpu": "512",
         "ExecutionRoleArn": {
           "Fn::GetAtt": [
-            "A2aUiRole1BDF4470",
+            "A2AUIRoleFA9232DA",
             "Arn",
           ],
         },
@@ -454,66 +454,19 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
         ],
         "TaskRoleArn": {
           "Fn::GetAtt": [
-            "A2aUiRole1BDF4470",
+            "A2AUIRoleFA9232DA",
             "Arn",
           ],
         },
       },
       "Type": "AWS::ECS::TaskDefinition",
     },
-    "A2aUiFargateServiceTaskDeflogrouterLogGroup0F9FF23D": {
+    "A2AUIFargateServiceTaskDeflogrouterLogGroup45BA7422": {
       "DeletionPolicy": "Retain",
       "Type": "AWS::Logs::LogGroup",
       "UpdateReplacePolicy": "Retain",
     },
-    "A2aUiRole1BDF4470": {
-      "Properties": {
-        "AssumeRolePolicyDocument": {
-          "Statement": [
-            {
-              "Action": "sts:AssumeRole",
-              "Effect": "Allow",
-              "Principal": {
-                "Service": "ecs-tasks.amazonaws.com",
-              },
-            },
-          ],
-          "Version": "2012-10-17",
-        },
-        "Policies": [
-          {
-            "PolicyDocument": {
-              "Statement": [
-                {
-                  "Action": [
-                    "ecr:GetAuthorizationToken",
-                    "ecr:BatchCheckLayerAvailability",
-                    "ecr:GetDownloadUrlForLayer",
-                    "ecr:BatchGetImage",
-                    "logs:CreateLogGroup",
-                    "logs:CreateLogStream",
-                    "logs:PutLogEvents",
-                    "logs:DescribeLogStreams",
-                  ],
-                  "Effect": "Allow",
-                  "Resource": "*",
-                },
-              ],
-              "Version": "2012-10-17",
-            },
-            "PolicyName": "deployment",
-          },
-        ],
-        "Tags": [
-          {
-            "Key": "aws-cdk:id",
-            "Value": "a2a-ui_c8dad2d593bd3acb8767464a30c78c651b78ed107b",
-          },
-        ],
-      },
-      "Type": "AWS::IAM::Role",
-    },
-    "A2aUiRoleDefaultPolicy56621E68": {
+    "A2AUIRoleDefaultPolicy75548887": {
       "Properties": {
         "PolicyDocument": {
           "Statement": [
@@ -581,7 +534,7 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
               "Effect": "Allow",
               "Resource": {
                 "Fn::GetAtt": [
-                  "A2aUiFargateServiceTaskDeflogrouterLogGroup0F9FF23D",
+                  "A2AUIFargateServiceTaskDeflogrouterLogGroup45BA7422",
                   "Arn",
                 ],
               },
@@ -589,14 +542,61 @@ exports[`api > should return a correct cloudformation snapshot 1`] = `
           ],
           "Version": "2012-10-17",
         },
-        "PolicyName": "A2aUiRoleDefaultPolicy56621E68",
+        "PolicyName": "A2AUIRoleDefaultPolicy75548887",
         "Roles": [
           {
-            "Ref": "A2aUiRole1BDF4470",
+            "Ref": "A2AUIRoleFA9232DA",
           },
         ],
       },
       "Type": "AWS::IAM::Policy",
+    },
+    "A2AUIRoleFA9232DA": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ecs-tasks.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "ecr:GetAuthorizationToken",
+                    "ecr:BatchCheckLayerAvailability",
+                    "ecr:GetDownloadUrlForLayer",
+                    "ecr:BatchGetImage",
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents",
+                    "logs:DescribeLogStreams",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*",
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "deployment",
+          },
+        ],
+        "Tags": [
+          {
+            "Key": "aws-cdk:id",
+            "Value": "a2a-ui_c8e48d5ab1bcbdea878e79c8826ddc765b9c61a505",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
     },
     "ClusterEB0386A7": {
       "Properties": {
