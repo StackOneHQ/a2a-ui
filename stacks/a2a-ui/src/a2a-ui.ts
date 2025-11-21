@@ -68,7 +68,7 @@ export class A2aUiService extends Construct {
         const resourceId = pascalCase(`${id}`, {
             transform: pascalCaseTransformMerge,
         });
-        super(scope, 'A2aUi');
+        super(scope, 'A2AUI');
 
         const region = Stack.of(scope).region;
 
@@ -200,7 +200,7 @@ export class A2aUiService extends Construct {
                 originRequestPolicy: OriginRequestPolicy.ALL_VIEWER,
                 cachePolicy: CachePolicy.CACHING_DISABLED, // Use optimized caching if serving static content
             },
-            domainNames: [`a2a.${props.hostedZone.zoneName}`],
+            domainNames: [`a2a-ui.${props.hostedZone.zoneName}`],
             // MUST BE IN US-EAST-1 AWS_REGION!
             certificate: Certificate.fromCertificateArn(
                 this,
@@ -213,7 +213,6 @@ export class A2aUiService extends Construct {
         new ARecord(this, `${resourceId}DNS`, {
             zone: props.hostedZone,
             recordName: 'a2a-ui',
-            ttl: Duration.minutes(2),
             target: RecordTarget.fromAlias(new CloudFrontTarget(distribution)),
         });
     }
