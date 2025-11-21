@@ -1,0 +1,25 @@
+{
+    "license": "UNLICENSED",
+    "scripts": {
+        "test": "vitest run",
+        "test:update": "vitest run -u",
+        "cdk": "cdk",
+        "lint": "biome check .",
+        "lint:fix": "biome check --write ."
+    },
+    "devDependencies": {
+        "@types/node": "24.10.0",
+        "aws-cdk": "2.1031.1",
+        "esbuild": "0.25.12",
+        "ts-node": "10.9.2",
+        "typescript": "5.9.3",
+        "unplugin-swc": "1.5.8",
+        "vitest": "4.0.6"
+    },
+    "dependencies": {
+        "aws-cdk-lib": "2.221.1",
+        "change-case": "4.1.2",
+        "constructs": "10.4.2",
+        "source-map-support": "0.5.21"
+    }
+}

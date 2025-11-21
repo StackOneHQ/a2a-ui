@@ -1,0 +1,69 @@
+{
+    "app": "npx ts-node --prefer-ts-exts index.ts",
+    "context": {
+        "environment": "staging",
+        "environments": {
+            "experiment": {
+                "eu-west-2": {
+                    "vpcId": "vpc-0505c63efba85a4cf",
+                    "hostedZone": "stackone-exp.com",
+                    "certificateArn": "arn:aws:acm:eu-west-2:553332017094:certificate/4d66a426-7102-4852-91fb-1ba8274f50c2",
+                    "datadogApiKeySecretArn": "arn:aws:secretsmanager:eu-west-2:553332017094:secret:DdApiKeySecret-FDLILY",
+                    "ecs": {
+                        "a2a-ui": {
+                            "dockerRepository": "arn:aws:ecr:eu-west-2:553332017094:repository/a2a/a2a-ui",
+                            "containerPort": 3000,
+                            "containerName": "a2a-ui",
+                            "desiredCount": 1
+                        }
+                    },
+                    "cloudfront": {
+                        "certificateArn": "arn:aws:acm:us-east-1:553332017094:certificate/4e1499e8-01b2-4486-a316-743d6e80b03d",
+                        "wafArn": "arn:aws:wafv2:us-east-1:553332017094:global/webacl/CloudFrontWebAcl/3f536158-73ee-4825-91aa-71122ffac2d1"
+                    }
+                }
+            },
+            "staging": {
+                "eu-west-1": {
+                    "vpcId": "vpc-0edb40e229cee9438",
+                    "hostedZone": "stackone-dev.com",
+                    "certificateArn": "arn:aws:acm:eu-west-1:852944399968:certificate/9905dcd6-f41b-4563-91f7-a8091df8978e",
+                    "datadogApiKeySecretArn": "arn:aws:secretsmanager:eu-west-1:852944399968:secret:DdApiKeySecret-jdvrvE4JrgZr-VPNgzM",
+                    "ecs": {
+                        "a2a-ui": {
+                            "dockerRepository": "arn:aws:ecr:eu-west-1:852944399968:repository/a2a/a2a-ui",
+                            "containerPort": 3000,
+                            "containerName": "a2a-ui",
+                            "desiredCount": 1
+                        }
+                    },
+                    "cloudfront": {
+                        "certificateArn": "arn:aws:acm:us-east-1:852944399968:certificate/36c8e044-a491-49b9-9da2-a8aeadb9fbdd",
+                        "wafId": "arn:aws:wafv2:us-east-1:852944399968:global/webacl/CloudFrontWebAcl/8ddaf750-4e69-48cc-adff-46d1f7ad4475"
+                    }
+                }
+            },
+            "production": {
+                "eu-west-1": {
+                    "vpcId": "vpc-080cfb2e250412c7d",
+                    "hostedZone": "stackone.com",
+                    "certificateArn": "arn:aws:acm:eu-west-1:458057158858:certificate/41abf844-d849-412e-947a-ca141c458a68",
+                    "datadogApiKeySecretArn": "arn:aws:secretsmanager:eu-west-1:458057158858:secret:DdApiKeySecret-IlHx3h9PKVca-Ptrcbg",
+                    "ecs": {
+                        "a2a-ui": {
+                            "dockerRepository": "arn:aws:ecr:eu-west-1:458057158858:repository/a2a/a2a-ui",
+                            "containerPort": 3000,
+                            "containerName": "a2a-ui",
+                            "desiredCount": 1
+                        }
+                    },
+                    "cloudfront": {
+                        "certificateArn": "arn:aws:acm:us-east-1:458057158858:certificate/72a2b360-8a93-4635-97ac-10972f1c4ea0",
+                        "wafId": "arn:aws:wafv2:us-east-1:458057158858:global/webacl/CloudFrontWebAcl/964fcea4-22ba-4c6f-90a5-67c6c47860cd"
+                    }
+                }
+            }
+        },
+        "releaseTag": "latest"
+    }
+}

@@ -1,0 +1,1306 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`api > should return a correct cloudformation snapshot 1`] = `
+{
+  "Description": "Defines the components for the a2a service",
+  "Mappings": {
+    "AWSCloudFrontPartitionHostedZoneIdMap": {
+      "aws": {
+        "zoneId": "Z2FDTNDATAQYW2",
+      },
+      "aws-cn": {
+        "zoneId": "Z3RFFRIM2A3IF5",
+      },
+    },
+  },
+  "Outputs": {
+    "A2AFargateServiceLoadBalancerDNS0221C4E3": {
+      "Value": {
+        "Fn::GetAtt": [
+          "A2AFargateServiceLBF5697ECA",
+          "DNSName",
+        ],
+      },
+    },
+    "A2AFargateServiceServiceURL5BEC2173": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Fn::GetAtt": [
+                "A2AFargateServiceLBF5697ECA",
+                "DNSName",
+              ],
+            },
+          ],
+        ],
+      },
+    },
+    "MigrationsTaskDefinitionArn": {
+      "Value": {
+        "Ref": "MigrationsMigrationsTaskDefinition88166088",
+      },
+    },
+    "MigrationsTaskSecurityGroupId": {
+      "Value": {
+        "Fn::GetAtt": [
+          "MigrationsMigrationsTaskSecurityGroup1FBBCEAD",
+          "GroupId",
+        ],
+      },
+    },
+    "MigrationsTaskSubnetIds": {
+      "Value": "p-12345,p-67890",
+    },
+  },
+  "Parameters": {
+    "BootstrapVersion": {
+      "Default": "/cdk-bootstrap/hnb659fds/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+    "SsmParameterValueawsserviceawsforfluentbitlatestC96584B6F00A464EAD1953AFF4B05118Parameter": {
+      "Default": "/aws/service/aws-for-fluent-bit/latest",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+  },
+  "Resources": {
+    "A2AApiAuroraAccessSGE4043334": {
+      "Properties": {
+        "GroupDescription": "a2a/A2A/ApiAuroraAccessSG",
+        "GroupName": "a2a-api-aurora-access-sg",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "VpcId": "vpc-12345",
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "A2AApiAuroraClusterC0CD99B7": {
+      "DeletionPolicy": "Snapshot",
+      "Properties": {
+        "BackupRetentionPeriod": 7,
+        "CopyTagsToSnapshot": true,
+        "DBClusterIdentifier": "a2a-aurora",
+        "DBClusterParameterGroupName": "default.aurora-postgresql17",
+        "DBSubnetGroupName": {
+          "Ref": "A2AApiAuroraClusterSubnetsBB792379",
+        },
+        "DatabaseName": "a2a",
+        "DeletionProtection": true,
+        "Engine": "aurora-postgresql",
+        "EngineVersion": "17.5",
+        "MasterUserPassword": {
+          "Fn::Join": [
+            "",
+            [
+              "{{resolve:secretsmanager:",
+              {
+                "Ref": "a2aA2AApiAuroraClusterSecret19C3A7693fdaad7efa858a3daf9490cf0a702aeb",
+              },
+              ":SecretString:password::}}",
+            ],
+          ],
+        },
+        "MasterUsername": "stackone",
+        "Port": 5432,
+        "ServerlessV2ScalingConfiguration": {
+          "MaxCapacity": 2,
+          "MinCapacity": 0.5,
+        },
+        "StorageEncrypted": true,
+        "VpcSecurityGroupIds": [
+          {
+            "Fn::GetAtt": [
+              "A2AApiAuroraSGAF595F54",
+              "GroupId",
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::RDS::DBCluster",
+      "UpdateReplacePolicy": "Snapshot",
+    },
+    "A2AApiAuroraClusterReader0EDBBCEF": {
+      "DeletionPolicy": "Delete",
+      "DependsOn": [
+        "A2AApiAuroraClusterWriter49FBDAC1",
+      ],
+      "Properties": {
+        "DBClusterIdentifier": {
+          "Ref": "A2AApiAuroraClusterC0CD99B7",
+        },
+        "DBInstanceClass": "db.serverless",
+        "DBInstanceIdentifier": "a2a-aurora-reader-1",
+        "EnablePerformanceInsights": true,
+        "Engine": "aurora-postgresql",
+        "PerformanceInsightsRetentionPeriod": 7,
+        "PromotionTier": 1,
+        "PubliclyAccessible": false,
+      },
+      "Type": "AWS::RDS::DBInstance",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "A2AApiAuroraClusterSecretAttachment2925418A": {
+      "Properties": {
+        "SecretId": {
+          "Ref": "a2aA2AApiAuroraClusterSecret19C3A7693fdaad7efa858a3daf9490cf0a702aeb",
+        },
+        "TargetId": {
+          "Ref": "A2AApiAuroraClusterC0CD99B7",
+        },
+        "TargetType": "AWS::RDS::DBCluster",
+      },
+      "Type": "AWS::SecretsManager::SecretTargetAttachment",
+    },
+    "A2AApiAuroraClusterSubnetsBB792379": {
+      "Properties": {
+        "DBSubnetGroupDescription": "Subnets for ApiAuroraCluster database",
+        "SubnetIds": [
+          "p-12345",
+          "p-67890",
+        ],
+      },
+      "Type": "AWS::RDS::DBSubnetGroup",
+    },
+    "A2AApiAuroraClusterWriter49FBDAC1": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "AutoMinorVersionUpgrade": false,
+        "DBClusterIdentifier": {
+          "Ref": "A2AApiAuroraClusterC0CD99B7",
+        },
+        "DBInstanceClass": "db.serverless",
+        "DBInstanceIdentifier": "a2a-aurora-writer",
+        "EnablePerformanceInsights": true,
+        "Engine": "aurora-postgresql",
+        "PerformanceInsightsRetentionPeriod": 7,
+        "PromotionTier": 0,
+        "PubliclyAccessible": false,
+      },
+      "Type": "AWS::RDS::DBInstance",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "A2AApiAuroraSGAF595F54": {
+      "Properties": {
+        "GroupDescription": "a2a/A2A/ApiAuroraSG",
+        "GroupName": "a2a-api-aurora-sg",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "VpcId": "vpc-12345",
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "A2AApiAuroraSGfroma2aA2AApiSG5A5E14EFIndirectPort48A232CC": {
+      "Properties": {
+        "Description": "Allow API service to connect to Aurora",
+        "FromPort": {
+          "Fn::GetAtt": [
+            "A2AApiAuroraClusterC0CD99B7",
+            "Endpoint.Port",
+          ],
+        },
+        "GroupId": {
+          "Fn::GetAtt": [
+            "A2AApiAuroraSGAF595F54",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "A2AApiSG65F6B076",
+            "GroupId",
+          ],
+        },
+        "ToPort": {
+          "Fn::GetAtt": [
+            "A2AApiAuroraClusterC0CD99B7",
+            "Endpoint.Port",
+          ],
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "A2AApiAuroraSGfroma2aMigrationsMetabaseSecurityGroup5EC77BE5IndirectPortD6448521": {
+      "Properties": {
+        "Description": "Allow metabase task to connect to Aurora",
+        "FromPort": {
+          "Fn::GetAtt": [
+            "A2AApiAuroraClusterC0CD99B7",
+            "Endpoint.Port",
+          ],
+        },
+        "GroupId": {
+          "Fn::GetAtt": [
+            "A2AApiAuroraSGAF595F54",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": "sg-22222222222222222",
+        "ToPort": {
+          "Fn::GetAtt": [
+            "A2AApiAuroraClusterC0CD99B7",
+            "Endpoint.Port",
+          ],
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "A2AApiAuroraSGfroma2aMigrationsMigrationsTaskSecurityGroup9EA3C807IndirectPort9D761EB0": {
+      "Properties": {
+        "Description": "Allow migrations task to connect to Aurora",
+        "FromPort": {
+          "Fn::GetAtt": [
+            "A2AApiAuroraClusterC0CD99B7",
+            "Endpoint.Port",
+          ],
+        },
+        "GroupId": {
+          "Fn::GetAtt": [
+            "A2AApiAuroraSGAF595F54",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "MigrationsMigrationsTaskSecurityGroup1FBBCEAD",
+            "GroupId",
+          ],
+        },
+        "ToPort": {
+          "Fn::GetAtt": [
+            "A2AApiAuroraClusterC0CD99B7",
+            "Endpoint.Port",
+          ],
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "A2AApiDNSFE44F8D3": {
+      "Properties": {
+        "AliasTarget": {
+          "DNSName": {
+            "Fn::GetAtt": [
+              "A2AApiDistribution05136DF3",
+              "DomainName",
+            ],
+          },
+          "HostedZoneId": {
+            "Fn::FindInMap": [
+              "AWSCloudFrontPartitionHostedZoneIdMap",
+              {
+                "Ref": "AWS::Partition",
+              },
+              "zoneId",
+            ],
+          },
+        },
+        "HostedZoneId": "DUMMY",
+        "Name": "a2a.stackone-exp.com.",
+        "Type": "A",
+      },
+      "Type": "AWS::Route53::RecordSet",
+    },
+    "A2AApiDistribution05136DF3": {
+      "Properties": {
+        "DistributionConfig": {
+          "Aliases": [
+            "a2a.stackone-exp.com",
+          ],
+          "DefaultCacheBehavior": {
+            "AllowedMethods": [
+              "GET",
+              "HEAD",
+              "OPTIONS",
+              "PUT",
+              "PATCH",
+              "POST",
+              "DELETE",
+            ],
+            "CachePolicyId": "4135ea2d-6df8-44a3-9df3-4b5a84be39ad",
+            "Compress": true,
+            "OriginRequestPolicyId": "216adef6-5c7f-47e4-b989-5492eafa07d3",
+            "TargetOriginId": "a2aA2AApiDistributionOrigin1C7AABD75",
+            "ViewerProtocolPolicy": "redirect-to-https",
+          },
+          "Enabled": true,
+          "HttpVersion": "http2",
+          "IPV6Enabled": true,
+          "Origins": [
+            {
+              "CustomOriginConfig": {
+                "OriginProtocolPolicy": "https-only",
+                "OriginSSLProtocols": [
+                  "TLSv1.2",
+                ],
+              },
+              "DomainName": {
+                "Fn::GetAtt": [
+                  "A2AFargateServiceLBF5697ECA",
+                  "DNSName",
+                ],
+              },
+              "Id": "a2aA2AApiDistributionOrigin1C7AABD75",
+            },
+          ],
+          "ViewerCertificate": {
+            "AcmCertificateArn": "arn:aws:acm:us-east-1:553332017094:certificate/4e1499e8-01b2-4486-a316-743d6e80b03d",
+            "MinimumProtocolVersion": "TLSv1.2_2021",
+            "SslSupportMethod": "sni-only",
+          },
+          "WebACLId": "arn:aws:wafv2:us-east-1:553332017094:global/webacl/CloudFrontWebAcl/3f536158-73ee-4825-91aa-71122ffac2d1",
+        },
+      },
+      "Type": "AWS::CloudFront::Distribution",
+    },
+    "A2AApiSG65F6B076": {
+      "Properties": {
+        "GroupDescription": "a2a/A2A/ApiSG",
+        "GroupName": "a2a-api-api-sg",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "VpcId": "vpc-12345",
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "A2AApiSGfroma2aA2AFargateServiceLBSecurityGroupFC5CBA0540807E49EE91": {
+      "Properties": {
+        "Description": "Load balancer to target",
+        "FromPort": 4080,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "A2AApiSG65F6B076",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": {
+          "Fn::GetAtt": [
+            "A2AFargateServiceLBSecurityGroup46E8328F",
+            "GroupId",
+          ],
+        },
+        "ToPort": 4080,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "A2AFargateService48A77222": {
+      "DependsOn": [
+        "A2AFargateServiceLBPublicListenerECSGroup2413F861",
+        "A2AFargateServiceLBPublicListenerB2F59A94",
+        "A2ARoleDefaultPolicy09AEC145",
+        "A2ARole980A1415",
+      ],
+      "Properties": {
+        "Cluster": {
+          "Ref": "ClusterEB0386A7",
+        },
+        "DeploymentConfiguration": {
+          "Alarms": {
+            "AlarmNames": [],
+            "Enable": false,
+            "Rollback": false,
+          },
+          "MaximumPercent": 200,
+          "MinimumHealthyPercent": 50,
+        },
+        "DesiredCount": 2,
+        "EnableECSManagedTags": true,
+        "EnableExecuteCommand": true,
+        "HealthCheckGracePeriodSeconds": 120,
+        "LaunchType": "FARGATE",
+        "LoadBalancers": [
+          {
+            "ContainerName": "a2a-api",
+            "ContainerPort": 4080,
+            "TargetGroupArn": {
+              "Ref": "A2AFargateServiceLBPublicListenerECSGroup2413F861",
+            },
+          },
+        ],
+        "NetworkConfiguration": {
+          "AwsvpcConfiguration": {
+            "AssignPublicIp": "DISABLED",
+            "SecurityGroups": [
+              {
+                "Fn::GetAtt": [
+                  "A2AApiSG65F6B076",
+                  "GroupId",
+                ],
+              },
+            ],
+            "Subnets": [
+              "p-12345",
+              "p-67890",
+            ],
+          },
+        },
+        "PropagateTags": "SERVICE",
+        "ServiceName": "api",
+        "TaskDefinition": {
+          "Ref": "A2AFargateServiceTaskDefFDBD79E9",
+        },
+      },
+      "Type": "AWS::ECS::Service",
+    },
+    "A2AFargateServiceLBF5697ECA": {
+      "Properties": {
+        "LoadBalancerAttributes": [
+          {
+            "Key": "deletion_protection.enabled",
+            "Value": "false",
+          },
+        ],
+        "Scheme": "internet-facing",
+        "SecurityGroups": [
+          {
+            "Fn::GetAtt": [
+              "A2AFargateServiceLBSecurityGroup46E8328F",
+              "GroupId",
+            ],
+          },
+        ],
+        "Subnets": [
+          "s-12345",
+          "s-67890",
+        ],
+        "Type": "application",
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+    },
+    "A2AFargateServiceLBPublicListenerB2F59A94": {
+      "Properties": {
+        "Certificates": [
+          {
+            "CertificateArn": "arn:aws:acm:eu-west-2:553332017094:certificate/4d66a426-7102-4852-91fb-1ba8274f50c2",
+          },
+        ],
+        "DefaultActions": [
+          {
+            "TargetGroupArn": {
+              "Ref": "A2AFargateServiceLBPublicListenerECSGroup2413F861",
+            },
+            "Type": "forward",
+          },
+        ],
+        "LoadBalancerArn": {
+          "Ref": "A2AFargateServiceLBF5697ECA",
+        },
+        "Port": 443,
+        "Protocol": "HTTPS",
+        "SslPolicy": "ELBSecurityPolicy-TLS13-1-2-2021-06",
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+    },
+    "A2AFargateServiceLBPublicListenerECSGroup2413F861": {
+      "Properties": {
+        "HealthCheckIntervalSeconds": 10,
+        "HealthCheckPath": "/healthz",
+        "HealthCheckTimeoutSeconds": 5,
+        "HealthyThresholdCount": 2,
+        "Matcher": {
+          "HttpCode": "200-399",
+        },
+        "Port": 80,
+        "Protocol": "HTTP",
+        "TargetGroupAttributes": [
+          {
+            "Key": "stickiness.enabled",
+            "Value": "false",
+          },
+        ],
+        "TargetType": "ip",
+        "UnhealthyThresholdCount": 3,
+        "VpcId": "vpc-12345",
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+    },
+    "A2AFargateServiceLBPublicRedirectListenerCEA0FCBB": {
+      "DependsOn": [
+        "A2AFargateServiceLBPublicListenerECSGroup2413F861",
+        "A2AFargateServiceLBPublicListenerB2F59A94",
+      ],
+      "Properties": {
+        "DefaultActions": [
+          {
+            "RedirectConfig": {
+              "Port": "443",
+              "Protocol": "HTTPS",
+              "StatusCode": "HTTP_301",
+            },
+            "Type": "redirect",
+          },
+        ],
+        "LoadBalancerArn": {
+          "Ref": "A2AFargateServiceLBF5697ECA",
+        },
+        "Port": 80,
+        "Protocol": "HTTP",
+      },
+      "Type": "AWS::ElasticLoadBalancingV2::Listener",
+    },
+    "A2AFargateServiceLBSecurityGroup46E8328F": {
+      "Properties": {
+        "GroupDescription": "Automatically created Security Group for ELB a2aA2AFargateServiceLBC1542D64",
+        "SecurityGroupIngress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow from anyone on port 443",
+            "FromPort": 443,
+            "IpProtocol": "tcp",
+            "ToPort": 443,
+          },
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow from anyone on port 80",
+            "FromPort": 80,
+            "IpProtocol": "tcp",
+            "ToPort": 80,
+          },
+        ],
+        "VpcId": "vpc-12345",
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "A2AFargateServiceLBSecurityGrouptoa2aA2AApiSG5A5E14EF4080D0BDD83A": {
+      "Properties": {
+        "Description": "Load balancer to target",
+        "DestinationSecurityGroupId": {
+          "Fn::GetAtt": [
+            "A2AApiSG65F6B076",
+            "GroupId",
+          ],
+        },
+        "FromPort": 4080,
+        "GroupId": {
+          "Fn::GetAtt": [
+            "A2AFargateServiceLBSecurityGroup46E8328F",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "ToPort": 4080,
+      },
+      "Type": "AWS::EC2::SecurityGroupEgress",
+    },
+    "A2AFargateServiceTaskDefFDBD79E9": {
+      "Properties": {
+        "ContainerDefinitions": [
+          {
+            "Environment": [
+              {
+                "Name": "ENV",
+                "Value": "staging",
+              },
+              {
+                "Name": "DATABASE_HOST",
+                "Value": {
+                  "Fn::GetAtt": [
+                    "A2AApiAuroraClusterC0CD99B7",
+                    "Endpoint.Address",
+                  ],
+                },
+              },
+              {
+                "Name": "DATABASE_PORT",
+                "Value": {
+                  "Fn::GetAtt": [
+                    "A2AApiAuroraClusterC0CD99B7",
+                    "Endpoint.Port",
+                  ],
+                },
+              },
+              {
+                "Name": "DATABASE_NAME",
+                "Value": "a2a",
+              },
+              {
+                "Name": "STACKONE_API_URL",
+                "Value": "https://api.stackone-dev.com/",
+              },
+              {
+                "Name": "STACKONE_A2A_URL",
+                "Value": "https://a2a.stackone-dev.com/",
+              },
+              {
+                "Name": "LISTEN_PORT",
+                "Value": "4080",
+              },
+            ],
+            "Essential": true,
+            "Image": {
+              "Fn::Join": [
+                "",
+                [
+                  "553332017094.dkr.ecr.eu-west-2.",
+                  {
+                    "Ref": "AWS::URLSuffix",
+                  },
+                  "/a2a/api:latest",
+                ],
+              ],
+            },
+            "LogConfiguration": {
+              "LogDriver": "awsfirelens",
+              "Options": {
+                "Host": "http-intake.logs.datadoghq.eu",
+                "Name": "datadog",
+                "TLS": "on",
+                "dd_service": "a2a-api",
+                "dd_source": "ecs",
+                "dd_tags": "env:staging,region:region,component:a2a-api",
+                "provider": "ecs",
+                "retry_limit": "2",
+              },
+              "SecretOptions": [
+                {
+                  "Name": "apikey",
+                  "ValueFrom": "arn:aws:secretsmanager:eu-west-2:553332017094:secret:DdApiKeySecret-FDLILY",
+                },
+              ],
+            },
+            "Name": "a2a-api",
+            "PortMappings": [
+              {
+                "ContainerPort": 4080,
+                "Protocol": "tcp",
+              },
+            ],
+            "Secrets": [
+              {
+                "Name": "DATABASE_USERNAME",
+                "ValueFrom": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Ref": "A2AApiAuroraClusterSecretAttachment2925418A",
+                      },
+                      ":username::",
+                    ],
+                  ],
+                },
+              },
+              {
+                "Name": "DATABASE_PASSWORD",
+                "ValueFrom": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Ref": "A2AApiAuroraClusterSecretAttachment2925418A",
+                      },
+                      ":password::",
+                    ],
+                  ],
+                },
+              },
+              {
+                "Name": "STACKONE_API_KEY",
+                "ValueFrom": "arn:aws:secretsmanager:eu-west-2:553332017094:secret:a2a/service-secrets-gRFMUd:stackone_api_key::",
+              },
+            ],
+          },
+          {
+            "Essential": true,
+            "FirelensConfiguration": {
+              "Type": "fluentbit",
+            },
+            "Image": {
+              "Ref": "SsmParameterValueawsserviceawsforfluentbitlatestC96584B6F00A464EAD1953AFF4B05118Parameter",
+            },
+            "LogConfiguration": {
+              "LogDriver": "awslogs",
+              "Options": {
+                "awslogs-group": {
+                  "Ref": "A2AFargateServiceTaskDeflogrouterLogGroupA378BA46",
+                },
+                "awslogs-region": "region",
+                "awslogs-stream-prefix": "firelens",
+              },
+            },
+            "MemoryReservation": 50,
+            "Name": "log-router",
+          },
+        ],
+        "Cpu": "512",
+        "ExecutionRoleArn": {
+          "Fn::GetAtt": [
+            "A2ARole980A1415",
+            "Arn",
+          ],
+        },
+        "Family": "a2a-api",
+        "Memory": "1024",
+        "NetworkMode": "awsvpc",
+        "RequiresCompatibilities": [
+          "FARGATE",
+        ],
+        "TaskRoleArn": {
+          "Fn::GetAtt": [
+            "A2ARole980A1415",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::ECS::TaskDefinition",
+    },
+    "A2AFargateServiceTaskDeflogrouterLogGroupA378BA46": {
+      "DeletionPolicy": "Retain",
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "A2ARole980A1415": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ecs-tasks.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "Policies": [
+          {
+            "PolicyDocument": {
+              "Statement": [
+                {
+                  "Action": [
+                    "ecr:GetAuthorizationToken",
+                    "ecr:BatchCheckLayerAvailability",
+                    "ecr:GetDownloadUrlForLayer",
+                    "ecr:BatchGetImage",
+                    "logs:CreateLogGroup",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents",
+                    "logs:DescribeLogStreams",
+                    "secretsmanager:GetSecretValue",
+                    "kms:Decrypt",
+                  ],
+                  "Effect": "Allow",
+                  "Resource": "*",
+                },
+              ],
+              "Version": "2012-10-17",
+            },
+            "PolicyName": "deployment",
+          },
+        ],
+        "Tags": [
+          {
+            "Key": "aws-cdk:id",
+            "Value": "a2a_c84f778dd8a931c9564c2ff4f11c47ddf0ecb5155b",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "A2ARoleDefaultPolicy09AEC145": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+              ],
+              "Effect": "Allow",
+              "Resource": "arn:aws:ecr:eu-west-2:553332017094:repository/a2a/api",
+            },
+            {
+              "Action": "ecr:GetAuthorizationToken",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": "arn:aws:secretsmanager:eu-west-2:553332017094:secret:DdApiKeySecret-FDLILY",
+            },
+            {
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Ref": "A2AApiAuroraClusterSecretAttachment2925418A",
+              },
+            },
+            {
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": "arn:aws:secretsmanager:eu-west-2:553332017094:secret:a2a/service-secrets-gRFMUd",
+            },
+            {
+              "Action": [
+                "ssmmessages:CreateControlChannel",
+                "ssmmessages:CreateDataChannel",
+                "ssmmessages:OpenControlChannel",
+                "ssmmessages:OpenDataChannel",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": "logs:DescribeLogGroups",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": [
+                "logs:CreateLogStream",
+                "logs:DescribeLogStreams",
+                "logs:PutLogEvents",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": [
+                "ecr:GetAuthorizationToken",
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "A2AFargateServiceTaskDeflogrouterLogGroupA378BA46",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "A2ARoleDefaultPolicy09AEC145",
+        "Roles": [
+          {
+            "Ref": "A2ARole980A1415",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "ClusterEB0386A7": {
+      "Properties": {
+        "ClusterName": "a2a",
+        "ClusterSettings": [
+          {
+            "Name": "containerInsights",
+            "Value": "enabled",
+          },
+        ],
+      },
+      "Type": "AWS::ECS::Cluster",
+    },
+    "MigrationsMigrationsTaskDefinition88166088": {
+      "Properties": {
+        "ContainerDefinitions": [
+          {
+            "Command": [
+              "migrate",
+            ],
+            "Environment": [
+              {
+                "Name": "ENV",
+                "Value": "staging",
+              },
+              {
+                "Name": "DATABASE_HOST",
+                "Value": {
+                  "Fn::GetAtt": [
+                    "A2AApiAuroraClusterC0CD99B7",
+                    "Endpoint.Address",
+                  ],
+                },
+              },
+              {
+                "Name": "DATABASE_PORT",
+                "Value": {
+                  "Fn::GetAtt": [
+                    "A2AApiAuroraClusterC0CD99B7",
+                    "Endpoint.Port",
+                  ],
+                },
+              },
+              {
+                "Name": "DATABASE_NAME",
+                "Value": "a2a",
+              },
+            ],
+            "Essential": true,
+            "Image": {
+              "Fn::Join": [
+                "",
+                [
+                  "553332017094.dkr.ecr.eu-west-2.",
+                  {
+                    "Ref": "AWS::URLSuffix",
+                  },
+                  "/a2a/api:latest",
+                ],
+              ],
+            },
+            "LogConfiguration": {
+              "LogDriver": "awsfirelens",
+              "Options": {
+                "Host": "http-intake.logs.datadoghq.eu",
+                "Name": "datadog",
+                "TLS": "on",
+                "dd_service": "a2a-migrations",
+                "dd_source": "ecs",
+                "dd_tags": "env:staging,region:region,component:a2a-migrations",
+                "provider": "ecs",
+                "retry_limit": "2",
+              },
+              "SecretOptions": [
+                {
+                  "Name": "apikey",
+                  "ValueFrom": "arn:aws:secretsmanager:eu-west-2:553332017094:secret:DdApiKeySecret-FDLILY",
+                },
+              ],
+            },
+            "Name": "migrations-container",
+            "Secrets": [
+              {
+                "Name": "DATABASE_USERNAME",
+                "ValueFrom": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Ref": "A2AApiAuroraClusterSecretAttachment2925418A",
+                      },
+                      ":username::",
+                    ],
+                  ],
+                },
+              },
+              {
+                "Name": "DATABASE_PASSWORD",
+                "ValueFrom": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Ref": "A2AApiAuroraClusterSecretAttachment2925418A",
+                      },
+                      ":password::",
+                    ],
+                  ],
+                },
+              },
+            ],
+          },
+          {
+            "Essential": true,
+            "FirelensConfiguration": {
+              "Type": "fluentbit",
+            },
+            "Image": {
+              "Ref": "SsmParameterValueawsserviceawsforfluentbitlatestC96584B6F00A464EAD1953AFF4B05118Parameter",
+            },
+            "LogConfiguration": {
+              "LogDriver": "awslogs",
+              "Options": {
+                "awslogs-group": {
+                  "Ref": "MigrationsMigrationsTaskDefinitionlogrouterLogGroupB3D7166B",
+                },
+                "awslogs-region": "region",
+                "awslogs-stream-prefix": "firelens",
+              },
+            },
+            "MemoryReservation": 50,
+            "Name": "log-router",
+          },
+        ],
+        "Cpu": "256",
+        "ExecutionRoleArn": {
+          "Fn::GetAtt": [
+            "MigrationsMigrationsTaskExecutionRoleC7162B6B",
+            "Arn",
+          ],
+        },
+        "Family": "migrations",
+        "Memory": "512",
+        "NetworkMode": "awsvpc",
+        "RequiresCompatibilities": [
+          "FARGATE",
+        ],
+        "TaskRoleArn": {
+          "Fn::GetAtt": [
+            "MigrationsMigrationsTaskRoleD46866FE",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::ECS::TaskDefinition",
+    },
+    "MigrationsMigrationsTaskDefinitionlogrouterLogGroupB3D7166B": {
+      "DeletionPolicy": "Retain",
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "MigrationsMigrationsTaskExecutionRoleC7162B6B": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ecs-tasks.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy",
+              ],
+            ],
+          },
+        ],
+        "Tags": [
+          {
+            "Key": "aws-cdk:id",
+            "Value": "a2a_c8e8a0d4fc4af3c19fa838d0816a068c4ae59319f0",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "MigrationsMigrationsTaskExecutionRoleDefaultPolicy99EB9372": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+              ],
+              "Effect": "Allow",
+              "Resource": "arn:aws:ecr:eu-west-2:553332017094:repository/a2a/api",
+            },
+            {
+              "Action": "ecr:GetAuthorizationToken",
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": "arn:aws:secretsmanager:eu-west-2:553332017094:secret:DdApiKeySecret-FDLILY",
+            },
+            {
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Ref": "A2AApiAuroraClusterSecretAttachment2925418A",
+              },
+            },
+            {
+              "Action": [
+                "ecr:GetAuthorizationToken",
+                "ecr:BatchCheckLayerAvailability",
+                "ecr:GetDownloadUrlForLayer",
+                "ecr:BatchGetImage",
+              ],
+              "Effect": "Allow",
+              "Resource": "*",
+            },
+            {
+              "Action": [
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::GetAtt": [
+                  "MigrationsMigrationsTaskDefinitionlogrouterLogGroupB3D7166B",
+                  "Arn",
+                ],
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "MigrationsMigrationsTaskExecutionRoleDefaultPolicy99EB9372",
+        "Roles": [
+          {
+            "Ref": "MigrationsMigrationsTaskExecutionRoleC7162B6B",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "MigrationsMigrationsTaskRoleD46866FE": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "ecs-tasks.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "MigrationsMigrationsTaskRoleDefaultPolicy1F68A476": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:DescribeSecret",
+                "kms:Decrypt",
+                "kms:DescribeKey",
+                "kms:GenerateDataKey",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Ref": "A2AApiAuroraClusterSecretAttachment2925418A",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "MigrationsMigrationsTaskRoleDefaultPolicy1F68A476",
+        "Roles": [
+          {
+            "Ref": "MigrationsMigrationsTaskRoleD46866FE",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "MigrationsMigrationsTaskSecurityGroup1FBBCEAD": {
+      "Properties": {
+        "GroupDescription": "Security group for the migration task",
+        "SecurityGroupEgress": [
+          {
+            "CidrIp": "0.0.0.0/0",
+            "Description": "Allow all outbound traffic by default",
+            "IpProtocol": "-1",
+          },
+        ],
+        "VpcId": "vpc-12345",
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "a2aA2AApiAuroraClusterSecret19C3A7693fdaad7efa858a3daf9490cf0a702aeb": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "Description": {
+          "Fn::Join": [
+            "",
+            [
+              "Generated by the CDK for stack: ",
+              {
+                "Ref": "AWS::StackName",
+              },
+            ],
+          ],
+        },
+        "GenerateSecretString": {
+          "ExcludeCharacters": " %+~\`#$&*()|[]{}:;<>?!'/@"\\",
+          "GenerateStringKey": "password",
+          "PasswordLength": 30,
+          "SecretStringTemplate": "{"username":"stackone"}",
+        },
+        "Name": "a2a/aurora-credentials",
+      },
+      "Type": "AWS::SecretsManager::Secret",
+      "UpdateReplacePolicy": "Delete",
+    },
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
+    },
+  },
+}
+`;

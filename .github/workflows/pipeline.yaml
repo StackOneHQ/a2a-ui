@@ -1,0 +1,361 @@
+name: pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  GITHUB_SHA: ${{ github.sha }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.job }}-${{ github.ref }}
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+      - name: Use Node.js 22.20.0
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version: 22.20.0
+          check-latest: true
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
+
+      - name: Use Node.js 22.20.0
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version: 22.20.0
+
+      - name: Install dependencies
+        run: npm ci --ignore-scripts
+
+      # - name: Run Lint
+      #   run: |
+      #     export NODE_OPTIONS=--max_old_space_size=4096
+      #     npm run lint
+
+  test:
+    runs-on: ubuntu-latest
+    continue-on-error: false
+    env:
+      ENVIRONMENT: staging
+      ENVIRONMENT_ROLE: arn:aws:iam::852944399968:role/StackOneGitHubActionsRole
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { role: a2a-ui, region: eu-west-1 }
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Use Node.js 22.20.0
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version: 22.20.0
+
+      - name: Install dependencies
+        working-directory: stacks/${{matrix.role}}
+        run: npm ci --ignore-scripts
+
+      - name: Run test
+        working-directory: stacks/${{matrix.role}}
+        run: npm run test
+
+      - name: Configure AWS Credentials
+        if: github.event_name != 'pull_request'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{env.ENVIRONMENT_ROLE}}
+          aws-region: ${{matrix.region}}
+
+      - name: Run synth
+        if: github.event_name != 'pull_request'
+        working-directory: stacks/${{matrix.role}}
+        run: |
+          pnpm exec cdk synth --all \
+            --context "environment=${ENVIRONMENT}" \
+            --context "releaseTag=${GITHUB_SHA}"
+
+  docker-staging:
+    needs: [build, test, lint]    
+    # Checkout code if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    environment: staging
+    runs-on: ubuntu-latest
+    env:
+      ENVIRONMENT: staging
+      ENVIRONMENT_ROLE: arn:aws:iam::852944399968:role/StackOneGitHubActionsRole
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { role: a2a-ui, region: eu-west-1 }
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@a03048d87541d1d9fcf2ecf528a4a65ba9bd7838 # v5.0.0
+        with:
+          role-to-assume: ${{env.ENVIRONMENT_ROLE}}
+          aws-region: ${{matrix.region}}
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@062b18b96a7aff071d4dc91bc00c4c1a7945b076 # v2.0.1
+        id: login-ecr
+
+      - name: Build + Tag image
+        run: |
+          docker build \
+            --platform linux/amd64 \
+            -f Dockerfile \
+            -t ${{ steps.login-ecr.outputs.registry }}/a2a/${{matrix.role}}:${{ github.sha }} \
+            -t ${{ steps.login-ecr.outputs.registry }}/a2a/${{matrix.role}}:latest \
+            --build-arg GIT_COMMIT_SHA=${{ github.sha }} \
+            --build-arg GIT_REPOSITORY_URL=${{ github.repositoryUrl }} \
+            --label org.opencontainers.image.revision=${{ github.sha }} \
+            --label org.opencontainers.image.source=https://github.com/StackOneHQ/a2a \
+            .
+            
+      - name: Push image to Amazon ECR
+        run: |
+          docker push ${{ steps.login-ecr.outputs.registry }}/a2a/${{matrix.role}}:${{ github.sha }}
+          docker push ${{ steps.login-ecr.outputs.registry }}/a2a/${{matrix.role}}:latest
+
+  # STAGING #
+  
+  deploy-staging:
+    needs: [docker-staging]
+    environment: staging
+    runs-on: ubuntu-latest
+    concurrency:
+      group: staging-${{ github.ref }}-${{matrix.role}}-${{matrix.region}}
+      cancel-in-progress: false
+    env:
+      ENVIRONMENT: staging
+      ENVIRONMENT_ROLE: arn:aws:iam::852944399968:role/StackOneGitHubActionsRole
+    strategy:
+      matrix:
+        include:
+          - { role: a2a-ui, region: eu-west-1 }
+    steps:
+      # Checkout code
+      - name: Checkout code
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      # Setup Node.js
+      - name: Use Node.js 22.20.0
+        uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version: 22.20.0
+
+      # Install all workspace dependencies from root
+      - name: Install dependencies
+        working-directory: stacks/${{matrix.role}}
+        run: npm ci --ignore-scripts
+
+      # Configure AWS credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@a03048d87541d1d9fcf2ecf528a4a65ba9bd7838 # v5.0.0
+        with:
+          role-to-assume: ${{env.ENVIRONMENT_ROLE}}
+          aws-region: ${{matrix.region}}
+
+      # Run CDK synth
+      - name: Run synth
+        working-directory: stacks/${{matrix.role}}
+        run: |
+          npx cdk synth --all \
+            --context "environment=${ENVIRONMENT}" \
+            --context "releaseTag=${GITHUB_SHA}"
+
+      # Run CDK deploy
+      - name: Run deploy
+        working-directory: stacks/${{matrix.role}}
+        run: |
+          npx cdk deploy \
+            --all \
+            --ci \
+            --context "environment=${ENVIRONMENT}" \
+            --context "releaseTag=${GITHUB_SHA}" \
+            --no-version-reporting \
+            --require-approval never \
+            --trace \
+            --verbose \
+            --output cdk.out/${ENVIRONMENT}/${{matrix.region}}/${{matrix.role}}
+
+  # migrate-staging:
+  #   needs: [deploy-staging]
+  #   runs-on: ubuntu-latest
+  #   environment: staging
+  #   concurrency:
+  #     group: staging-${{ github.ref }}-${{matrix.component}}-${{matrix.region}}
+  #     cancel-in-progress: false
+  #   env:
+  #     ENVIRONMENT: staging
+  #     ENVIRONMENT_ROLE: arn:aws:iam::852944399968:role/StackOneGitHubActionsRole
+  #   strategy:
+  #     matrix:
+  #       include:
+  #         - { component: api, region: eu-west-1 }
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #     - name: Trigger migrations
+  #       uses: ./.github/actions/migrations
+  #       with:
+  #         role: "${{ env.ENVIRONMENT_ROLE }}"
+  #         component: ${{ matrix.component }}
+  #         region: ${{ matrix.region }}
+
+  # # PRODUCTION #
+
+  # docker-production:
+  #   needs: [build, lint, test]
+  #   if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+  #   environment: production
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     ENVIRONMENT: production
+  #     ENVIRONMENT_ROLE: arn:aws:iam::458057158858:role/StackOneGitHubActionsRole
+  #   strategy:
+  #     fail-fast: true
+  #     matrix:
+  #       include:
+  #         - { role: a2a, region: eu-west-1 }
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+
+  #     - name: Configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         role-to-assume: ${{env.ENVIRONMENT_ROLE}}
+  #         aws-region: ${{matrix.region}}
+
+  #     - name: Login to Amazon ECR
+  #       uses: aws-actions/amazon-ecr-login@v2
+  #       id: login-ecr
+
+  #     - name: Build + Tag image
+  #       run: |
+  #         docker build \
+  #           --platform linux/amd64 \
+  #           -f apps/${{matrix.role}}/Dockerfile \
+  #           -t ${{ steps.login-ecr.outputs.registry }}/idp/${{matrix.role}}:${{ github.sha }} \
+  #           -t ${{ steps.login-ecr.outputs.registry }}/idp/${{matrix.role}}:latest \
+  #           --build-arg GIT_COMMIT_SHA=${{ github.sha }} \
+  #           --build-arg GIT_REPOSITORY_URL=${{ github.repositoryUrl }} \
+  #           --label org.opencontainers.image.revision=${{ github.sha }} \
+  #           --label org.opencontainers.image.source=https://github.com/StackOneHQ/auth \
+  #           .
+            
+  #     - name: Push image to Amazon ECR
+  #       run: |
+  #         docker push ${{ steps.login-ecr.outputs.registry }}/idp/${{matrix.role}}:${{ github.sha }}
+  #         docker push ${{ steps.login-ecr.outputs.registry }}/idp/${{matrix.role}}:latest
+
+  # deploy-production:
+  #   needs: [docker-production]
+  #   environment: production
+  #   runs-on: ubuntu-latest
+  #   concurrency:
+  #     group: production-${{ github.ref }}-${{matrix.role}}-${{matrix.region}}
+  #     cancel-in-progress: false
+  #   env:
+  #     ENVIRONMENT: production
+  #     ENVIRONMENT_ROLE: arn:aws:iam::458057158858:role/StackOneGitHubActionsRole
+  #   strategy:
+  #     matrix:
+  #       include:
+  #         - { role: idp, region: eu-west-1 }
+  #   steps:
+  #     # Checkout code
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+
+  #     # Setup Node.js
+  #     - name: Use Node.js 22.14.0
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 22.14.0
+
+  #     # Setup pnpm
+  #     - name: Setup pnpm
+  #       uses: pnpm/action-setup@v2
+  #       with:
+  #         version: 9
+
+  #     # Install all workspace dependencies from root
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
+
+  #     # Configure AWS credentials
+  #     - name: Configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         role-to-assume: ${{env.ENVIRONMENT_ROLE}}
+  #         aws-region: ${{matrix.region}}
+
+  #     # Run CDK synth
+  #     - name: Run synth
+  #       working-directory: stacks/${{matrix.role}}
+  #       run: |
+  #         pnpm exec cdk synth --all \
+  #           --context "environment=${ENVIRONMENT}" \
+  #           --context "releaseTag=${GITHUB_SHA}"
+
+  #     # Run CDK deploy
+  #     - name: Run deploy
+  #       working-directory: stacks/${{matrix.role}}
+  #       run: |
+  #         pnpm exec cdk deploy \
+  #           --all \
+  #           --ci \
+  #           --context "environment=${ENVIRONMENT}" \
+  #           --context "releaseTag=${GITHUB_SHA}" \
+  #           --no-version-reporting \
+  #           --require-approval never \
+  #           --trace \
+  #           --verbose \
+  #           --output cdk.out/${ENVIRONMENT}/${{matrix.region}}/${{matrix.role}}
+
+  # migrate-production:
+  #   needs: [deploy-production]
+  #   runs-on: ubuntu-latest
+  #   environment: production
+  #   concurrency:
+  #     group: production-${{ github.ref }}-${{matrix.component}}-${{matrix.region}}
+  #     cancel-in-progress: false
+  #   env:
+  #     ENVIRONMENT: production
+  #     ENVIRONMENT_ROLE: arn:aws:iam::458057158858:role/StackOneGitHubActionsRole
+  #   strategy:
+  #     matrix:
+  #       include:
+  #         - { component: idp, region: eu-west-1 }
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+  #     - name: Trigger migrations
+  #       uses: ./.github/actions/migrations
+  #       with:
+  #         role: "${{ env.ENVIRONMENT_ROLE }}"
+  #         component: ${{ matrix.component }}
+  #         region: ${{ matrix.region }}
