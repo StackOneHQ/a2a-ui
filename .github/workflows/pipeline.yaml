@@ -89,7 +89,7 @@ jobs:
         if: github.event_name != 'pull_request'
         working-directory: stacks/${{matrix.role}}
         run: |
-          pnpm exec cdk synth --all \
+          npx cdk synth --all \
             --context "environment=${ENVIRONMENT}" \
             --context "releaseTag=${GITHUB_SHA}"
 
